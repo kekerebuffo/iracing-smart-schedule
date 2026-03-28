@@ -2,12 +2,7 @@ import { getTracks } from '@/lib/dataService';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronLeft, Ruler, Flag, Globe, MapPin, CreditCard, Box } from 'lucide-react';
-import dynamic from 'next/dynamic';
-
-const TrackMap = dynamic(() => import('@/components/tracks/TrackMap'), { 
-  ssr: false,
-  loading: () => <div className="h-[300px] bg-zinc-900 animate-pulse rounded-xl" />
-});
+import { TrackMapWrapper as TrackMap } from '@/components/tracks/TrackMapWrapper';
 
 export default async function TrackDetailPage({ params }: { params: { id: string } }) {
   const tracks = await getTracks();

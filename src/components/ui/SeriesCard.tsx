@@ -36,7 +36,7 @@ export function SeriesCard({ series, currentWeek, isFavorite, onToggleFavorite, 
       <div className="flex justify-between items-start mb-4">
         <div className="pr-4">
           <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-sm inline-block mb-2 mr-2 leading-none", getLicenseColor(series.license))}>
-            {t('class')} {series.license}
+            {series.license === 'R' ? 'Rookie' : `${t('class')} ${series.license}`}
           </span>
           <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{series.category}</span>
           <h3 className="font-bold text-lg text-white leading-tight mt-1">{series.seriesName}</h3>

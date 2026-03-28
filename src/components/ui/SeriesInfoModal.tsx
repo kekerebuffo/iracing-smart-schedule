@@ -55,7 +55,7 @@ export function SeriesInfoModal({ isOpen, onClose, series, currentWeek }: Props)
           <div>
             <div className="flex items-center gap-3 mb-2">
               <span className="bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-widest leading-none">
-                Class {series.license}
+                {series.license === 'R' ? 'Rookie' : `Class ${series.license}`}
               </span>
               <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest">{series.category}</span>
             </div>

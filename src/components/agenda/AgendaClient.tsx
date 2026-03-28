@@ -111,7 +111,7 @@ export function AgendaClient({ schedule, freeCars = [], freeTracks = [] }: Props
                     </div>
                     <div className="text-right">
                       <span className="text-[10px] font-bold text-zinc-300 bg-zinc-800/80 px-3 py-1 rounded-sm uppercase tracking-widest border border-zinc-700/50">
-                        CLASS {series.license}
+                        {series.license === 'R' ? 'ROOKIE' : `CLASS ${series.license}`}
                       </span>
                     </div>
                   </div>

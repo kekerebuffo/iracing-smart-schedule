@@ -98,7 +98,7 @@ export function CarsClient({ cars }: Props) {
             <div className="px-5 py-3 border-t border-zinc-800/50 bg-zinc-950/30 flex items-center justify-between">
               <div className="flex gap-2">
                 {car.rain_enabled === 'TRUE' && (
-                  <Droplets className="w-3.5 h-3.5 text-blue-500" title="Rain Enabled" />
+                  <Droplets className="w-3.5 h-3.5 text-blue-500" />
                 )}
                 <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">
                   {car.free_with_subscription === 'TRUE' ? 'FREE' : car.price_display || car.price}

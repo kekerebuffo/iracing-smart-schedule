@@ -18,9 +18,11 @@ export interface iRacingCar {
   hp: string;
   car_weight: string;
   price: string;
+  price_display?: string;
   free_with_subscription: string;
   rain_enabled: string;
   search_filters: string;
+  forum_url?: string;
 }
 
 export interface iRacingTrack {
