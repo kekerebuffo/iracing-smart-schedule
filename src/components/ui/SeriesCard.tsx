@@ -1,16 +1,20 @@
 import { Star, Timer, Thermometer, CloudRain, Flag, ShieldAlert, Car } from 'lucide-react';
 import { cn } from '@/components/layout/Sidebar';
 import { IRacingSeries, SeriesWeek } from '@/lib/scheduleProcessor';
+import { useLanguageStore } from '@/store/useLanguageStore';
 
 interface Props {
   series: IRacingSeries;
   currentWeek: SeriesWeek;
   isFavorite: boolean;
   onToggleFavorite: () => void;
+  ownedCar: boolean;
   ownedTrack: boolean;
 }
 
-export function SeriesCard({ series, currentWeek, isFavorite, onToggleFavorite, ownedTrack }: Props) {
+export function SeriesCard({ series, currentWeek, isFavorite, onToggleFavorite, ownedCar, ownedTrack }: Props) {
+  const { t } = useLanguageStore();
+  const isApto = ownedCar && ownedTrack;
   const getLicenseColor = (lic: string) => {
     switch (lic) {
       case 'R': return 'bg-red-600 text-white';
@@ -29,7 +33,7 @@ export function SeriesCard({ series, currentWeek, isFavorite, onToggleFavorite, 
       <div className="flex justify-between items-start mb-4">
         <div className="pr-4">
           <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-sm inline-block mb-2 mr-2 leading-none", getLicenseColor(series.license))}>
-            CLASS {series.license}
+            {t('class')} {series.license}
           </span>
           <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{series.category}</span>
           <h3 className="font-bold text-lg text-white leading-tight mt-1">{series.seriesName}</h3>
@@ -43,17 +47,31 @@ export function SeriesCard({ series, currentWeek, isFavorite, onToggleFavorite, 
       </div>
 
       <div className="mt-auto pt-4 border-t border-zinc-800/50">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Current Week (W{currentWeek.weekNum})</span>
-          {ownedTrack ? (
-            <span className="text-[10px] font-bold text-green-400 bg-green-950/40 px-2 py-0.5 rounded border border-green-900/50 uppercase tracking-wider flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 bg-green-500 rounded-full shadow-[0_0_5px_#22c55e]"></span> Owned
-            </span>
-          ) : (
-             <span className="text-[10px] font-bold text-red-400 bg-red-950/40 px-2 py-0.5 rounded border border-red-900/50 uppercase tracking-wider flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span> Unowned
-            </span>
-          )}
+        <div className="flex flex-col gap-2 mb-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{t('car')}</span>
+            {ownedCar ? (
+              <span className="text-[9px] font-bold text-green-400 bg-green-950/20 px-1.5 py-0.5 rounded border border-green-900/30 uppercase tracking-tighter">{t('owned')}</span>
+            ) : (
+              <span className="text-[9px] font-bold text-red-400 bg-red-950/20 px-1.5 py-0.5 rounded border border-red-900/30 uppercase tracking-tighter">{t('unowned')}</span>
+            )}
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{t('track')}</span>
+            {ownedTrack ? (
+              <span className="text-[9px] font-bold text-green-400 bg-green-950/20 px-1.5 py-0.5 rounded border border-green-900/30 uppercase tracking-tighter">{t('owned')}</span>
+            ) : (
+              <span className="text-[9px] font-bold text-red-400 bg-red-950/20 px-1.5 py-0.5 rounded border border-red-900/30 uppercase tracking-tighter">{t('unowned')}</span>
+            )}
+          </div>
+          <div className="flex items-center justify-between pt-1 border-t border-zinc-800/30">
+            <span className="text-[10px] text-zinc-100 font-black uppercase tracking-wider">{t('status')}</span>
+            {isApto ? (
+              <span className="text-[10px] font-black text-white bg-green-600 px-2 py-0.5 rounded shadow-[0_0_10px_rgba(34,197,94,0.3)] uppercase tracking-wider">{t('apto')}</span>
+            ) : (
+              <span className="text-[10px] font-black text-white bg-red-600/50 px-2 py-0.5 rounded uppercase tracking-wider">{t('no_apto')}</span>
+            )}
+          </div>
         </div>
         <div className="bg-zinc-950/50 rounded p-3 text-zinc-300 font-medium text-[13px] border border-zinc-800/30">
           📍 {currentWeek.trackName}
@@ -75,7 +93,7 @@ export function SeriesCard({ series, currentWeek, isFavorite, onToggleFavorite, 
           {currentWeek.rain && currentWeek.rain.toLowerCase() !== 'none' && (
             <div className="flex items-center gap-1.5 text-[9px] text-zinc-400 bg-zinc-900 border border-zinc-800 px-2 py-1 rounded-md uppercase tracking-wider font-bold">
               <CloudRain className="w-3 h-3 text-cyan-400" />
-              Rain: {currentWeek.rain}
+              {t('rain')}: {currentWeek.rain}
             </div>
           )}
           {currentWeek.startType && (
@@ -87,7 +105,7 @@ export function SeriesCard({ series, currentWeek, isFavorite, onToggleFavorite, 
           {currentWeek.cautions && currentWeek.cautions.toLowerCase() !== 'disabled' && (
             <div className="flex items-center gap-1.5 text-[9px] text-zinc-400 bg-zinc-900 border border-zinc-800 px-2 py-1 rounded-md uppercase tracking-wider font-bold">
               <ShieldAlert className="w-3 h-3 text-yellow-500" />
-              Caut: {currentWeek.cautions}
+              {t('cautions')}: {currentWeek.cautions}
             </div>
           )}
           {series.cars && series.cars.length > 0 && (

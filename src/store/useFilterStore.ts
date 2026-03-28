@@ -19,6 +19,8 @@ interface FilterState {
   toggleFavorite: (seriesId: string) => void;
   toggleOwnedCar: (car: string) => void;
   toggleOwnedTrack: (track: string) => void;
+  userEmail: string | null;
+  setUserEmail: (email: string | null) => void;
 }
 
 export const useFilterStore = create<FilterState>()(
@@ -32,6 +34,8 @@ export const useFilterStore = create<FilterState>()(
       licenses: [],
       types: [],
       favorites: [],
+      userEmail: null,
+      setUserEmail: (email) => set({ userEmail: email }),
       toggleOwnedOnly: () => set((state) => ({ ownedOnly: !state.ownedOnly })),
       toggleOwnedCarsOnly: () => set((state) => ({ ownedCarsOnly: !state.ownedCarsOnly })),
       toggleShowOnlyOwned: () => set((state) => ({ showOnlyOwned: !state.showOnlyOwned })),

@@ -1,6 +1,7 @@
 'use client'
 
 import { useFilterStore } from '@/store/useFilterStore';
+import { useLanguageStore } from '@/store/useLanguageStore';
 import Link from 'next/link';
 import { cn } from '@/components/layout/Sidebar';
 import { ToggleRight, ToggleLeft, Car } from 'lucide-react';
@@ -26,6 +27,7 @@ function ToggleButton({ active, onClick, children, className }: { active: boolea
 }
 
 export function FilterBar() {
+  const { t } = useLanguageStore();
   const {
     licenses, toggleLicense,
     types, toggleType,
@@ -40,7 +42,7 @@ export function FilterBar() {
       
       <div className="space-y-3 shrink-0">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">Content Check</span>
+          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">{t('content_check')}</span>
         </div>
         
         <div className="flex items-center gap-3 w-full lg:w-auto">
@@ -54,7 +56,7 @@ export function FilterBar() {
             )}
           >
             <Car className="w-4 h-4" />
-            {hasOwnedContent ? 'Mi Garaje' : 'Configurar Garaje'}
+            {hasOwnedContent ? t('garage') : t('configure_garage')}
           </Link>
           
           <button
@@ -69,13 +71,13 @@ export function FilterBar() {
             )}
           >
             {showOnlyOwned ? <ToggleRight className="w-5 h-5 text-green-400" /> : <ToggleLeft className="w-5 h-5" />}
-            Ocultar contenido bloqueado
+            {t('hide_unowned')}
           </button>
         </div>
       </div>
 
       <div className="xl:border-l xl:border-zinc-800 xl:pl-6 space-y-3 shrink-0 h-full flex flex-col justify-center">
-        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">License Class Filter</span>
+        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">{t('license_filter')}</span>
         <div className="flex flex-wrap gap-2">
           {LICENSES.map(lic => (
             <ToggleButton
@@ -91,7 +93,7 @@ export function FilterBar() {
       </div>
 
       <div className="xl:border-l xl:border-zinc-800 xl:pl-6 space-y-3 flex-1 w-full relative h-full flex flex-col justify-center">
-        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">Racing Discipline Filter (OR)</span>
+        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">{t('discipline_filter')}</span>
         <div className="flex flex-wrap gap-2.5">
           {CATEGORIES.map(cat => (
             <ToggleButton

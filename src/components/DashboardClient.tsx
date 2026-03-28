@@ -1,11 +1,12 @@
 'use client'
 
 import { useFilterStore } from '@/store/useFilterStore';
+import { useLanguageStore } from '@/store/useLanguageStore';
 import { FilterBar } from '@/components/filters/FilterBar';
 import { SeriesCard } from '@/components/ui/SeriesCard';
 import { IRacingSeries, getCurrentWeek } from '@/lib/scheduleProcessor';
-import { isTuesdayAlertActive } from '@/lib/dateUtils';
-import { AlertTriangle } from 'lucide-react';
+import { isTuesdayAlertActive, getIRacingWeek, getSeasonInfo } from '@/lib/dateUtils';
+import { AlertTriangle, Calendar } from 'lucide-react';
 
 interface Props {
   schedule: IRacingSeries[];
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function DashboardClient({ schedule }: Props) {
+  const { t } = useLanguageStore();
   const { 
     ownedOnly, ownedCarsOnly, 
     showOnlyOwned, ownedCars, ownedTracks,
@@ -20,6 +22,8 @@ export function DashboardClient({ schedule }: Props) {
   } = useFilterStore();
   
   const alertActive = isTuesdayAlertActive();
+  const currentIRacingWeek = getIRacingWeek();
+  const seasonInfo = getSeasonInfo();
 
   const isTrackOwned = (trackName: string) => {
     if (ownedTracks.includes(trackName)) return true;
@@ -39,7 +43,7 @@ export function DashboardClient({ schedule }: Props) {
     // Heuristic for "free" cars if not in strict mode
     if (!showOnlyOwned) {
       const freeCars = ['Mazda', 'Mustang', 'Legends', 'Street Stock', 'Formula Vee', 'Formula 1600', 'Toyota', 'Clio'];
-      if (freeCars.some(c => series.seriesName.includes(c))) return true;
+      if (freeCars.some(c => series.seriesName.toLowerCase().includes(c.toLowerCase()))) return true;
     }
     return false;
   };
@@ -65,10 +69,22 @@ export function DashboardClient({ schedule }: Props) {
 
   return (
     <div className="animate-in fade-in duration-500 max-w-[1600px] mx-auto pb-10">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-white mb-1 uppercase">Race Dashboard</h1>
-          <p className="text-zinc-400 font-medium">Find your next race across {filteredSchedule.length} available active series.</p>
+          <h1 className="text-3xl font-black tracking-tight text-white mb-1 uppercase">{t('dashboard')}</h1>
+          <p className="text-zinc-400 font-medium truncate max-w-md">
+            {t('dashboard_desc').replace('{count}', filteredSchedule.length.toString())}
+          </p>
+        </div>
+        
+        <div className="flex items-center gap-3 bg-zinc-900/50 border border-zinc-800 p-3 rounded-xl">
+          <div className="bg-blue-600/20 p-2 rounded-lg">
+            <Calendar className="w-5 h-5 text-blue-500" />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{seasonInfo}</p>
+            <p className="text-white font-black text-lg leading-none mt-1">{t('week')} {currentIRacingWeek}</p>
+          </div>
         </div>
       </div>
 
@@ -78,8 +94,8 @@ export function DashboardClient({ schedule }: Props) {
             <AlertTriangle className="w-6 h-6 text-red-500" />
           </div>
           <div>
-            <h3 className="text-red-400 font-bold uppercase tracking-wider mb-1">Tuesday Season Reset Approaching</h3>
-            <p className="text-red-200/80 text-sm">You are within 48 hours of the Tuesday 00:00 UTC track rotation. Prepare for next week's circuits!</p>
+            <h3 className="text-red-400 font-bold uppercase tracking-wider mb-1">{t('season_reset')}</h3>
+            <p className="text-red-200/80 text-sm">{t('season_reset_desc')}</p>
           </div>
         </div>
       )}
@@ -97,13 +113,14 @@ export function DashboardClient({ schedule }: Props) {
               currentWeek={currentWk}
               isFavorite={isFav}
               onToggleFavorite={() => toggleFavorite(series.seriesName)}
+              ownedCar={isCarOwned(series)}
               ownedTrack={isTrackOwned(currentWk.trackName)}
             />
           );
         })}
         {filteredSchedule.length === 0 && (
           <div className="col-span-full py-20 text-center border border-dashed border-zinc-800 rounded-xl">
-            <p className="text-zinc-500 font-bold uppercase tracking-widest">No Series Match Your Filters</p>
+            <p className="text-zinc-500 font-bold uppercase tracking-widest">{t('no_results')}</p>
           </div>
         )}
       </div>

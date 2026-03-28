@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Calendar, Flag } from 'lucide-react';
+import { useLanguageStore } from '@/store/useLanguageStore';
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -12,10 +13,11 @@ export function cn(...inputs: ClassValue[]) {
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { t } = useLanguageStore();
 
   const links = [
-    { href: '/', label: 'Dashboard', icon: Home },
-    { href: '/agenda', label: 'Favorite Agenda', icon: Calendar },
+    { href: '/', label: t('home'), icon: Home },
+    { href: '/agenda', label: t('agenda'), icon: Calendar },
   ];
 
   return (

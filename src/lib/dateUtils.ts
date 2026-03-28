@@ -1,16 +1,37 @@
-export const isTuesdayAlertActive = (date: Date = new Date()): boolean => {
-  const futureDate = new Date(date.getTime() + 48 * 60 * 60 * 1000);
+/**
+ * iRacing Week Calculation Utility
+ * Weeks start on Tuesday at 00:00 UTC.
+ * Season 2, 2026 starts on March 10, 2026.
+ */
+
+export function getIRacingWeek() {
+  const now = new Date();
   
-  // Encontrar el próximo Martes a las 00:00 UTC
-  const nextTuesday = new Date(date);
-  nextTuesday.setUTCDate(date.getUTCDate() + ((2 - date.getUTCDay() + 7) % 7));
+  // Reference: Season 2, 2026 Week 1 starts March 10, 2026 00:00 UTC
+  const seasonStart = new Date(Date.UTC(2026, 2, 10, 0, 0, 0)); 
   
-  // Si hoy es martes, y ya pasamos las 00:00, el próximo es en 7 días
-  if (nextTuesday.getUTCDay() === date.getUTCDay() && date.getUTCHours() > 0) {
-    nextTuesday.setUTCDate(nextTuesday.getUTCDate() + 7);
-  }
-  nextTuesday.setUTCHours(0, 0, 0, 0);
+  const diffMs = now.getTime() - seasonStart.getTime();
+  const diffWeeks = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7)) + 1;
   
-  const diffHours = (nextTuesday.getTime() - date.getTime()) / (1000 * 60 * 60);
-  return diffHours > 0 && diffHours <= 48;
-};
+  // Basic range check
+  if (diffWeeks < 1) return 1;
+  if (diffWeeks > 13) return 13;
+  
+  return diffWeeks;
+}
+
+export function getSeasonInfo() {
+  return "2026 Season 2";
+}
+
+export function isTuesdayAlertActive() {
+  const now = new Date();
+  const day = now.getUTCDay(); // 0-6 (Sun-Sat)
+  const hour = now.getUTCHours();
+  
+  // Tuesday is day 2. 
+  // We want to alert on Sunday (0) afternoon or Monday (1).
+  if (day === 0 && hour >= 12) return true;
+  if (day === 1) return true;
+  return false;
+}
