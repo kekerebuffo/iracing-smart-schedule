@@ -11,9 +11,11 @@ import { AlertTriangle, Calendar } from 'lucide-react';
 interface Props {
   schedule: IRacingSeries[];
   ownedTracks: number[]; 
+  freeCars: string[];
+  freeTracks: string[];
 }
 
-export function DashboardClient({ schedule }: Props) {
+export function DashboardClient({ schedule, freeCars = [], freeTracks = [] }: Props) {
   const { t } = useLanguageStore();
   const { 
     ownedOnly, ownedCarsOnly, 
@@ -27,11 +29,12 @@ export function DashboardClient({ schedule }: Props) {
 
   const isTrackOwned = (trackName: string) => {
     if (ownedTracks.includes(trackName)) return true;
+    if (freeTracks.some(t => trackName.includes(t) || t.includes(trackName))) return true;
     
-    // Heuristic for "free" tracks if not in strict mode
+    // Heuristic for "free" tracks if not in strict mode (legacy fallback)
     if (!showOnlyOwned) {
-      const freeTracks = ['Charlotte', 'USA International', 'Lanier', 'South Boston', 'Oulton', 'Tsukuba', 'Okayama', 'Summit Point', 'Lime Rock', 'Laguna Seca', 'Concord', 'Oxford', 'Centripetal'];
-      if (freeTracks.some(t => trackName.includes(t))) return true;
+      const legacyFreeTracks = ['Charlotte', 'USA International', 'Lanier', 'South Boston', 'Oulton', 'Tsukuba', 'Okayama', 'Summit Point', 'Lime Rock', 'Laguna Seca', 'Concord', 'Oxford', 'Centripetal'];
+      if (legacyFreeTracks.some(t => trackName.includes(t))) return true;
     }
     return false;
   };
@@ -40,10 +43,14 @@ export function DashboardClient({ schedule }: Props) {
     // A series is "owned" if at least one of its cars is owned
     if (series.cars && series.cars.some(c => ownedCars.includes(c))) return true;
     
-    // Heuristic for "free" cars if not in strict mode
+    // Check against CSV free content
+    if (series.cars && series.cars.some(c => freeCars.some(fc => c.includes(fc) || fc.includes(c)))) return true;
+    if (freeCars.some(fc => series.seriesName.toLowerCase().includes(fc.toLowerCase()))) return true;
+
+    // Heuristic for "free" cars if not in strict mode (legacy fallback)
     if (!showOnlyOwned) {
-      const freeCars = ['Mazda', 'Mustang', 'Legends', 'Street Stock', 'Formula Vee', 'Formula 1600', 'Toyota', 'Clio'];
-      if (freeCars.some(c => series.seriesName.toLowerCase().includes(c.toLowerCase()))) return true;
+      const legacyFreeCars = ['Mazda', 'Mustang', 'Legends', 'Street Stock', 'Formula Vee', 'Formula 1600', 'Toyota', 'Clio'];
+      if (legacyFreeCars.some(c => series.seriesName.toLowerCase().includes(c.toLowerCase()))) return true;
     }
     return false;
   };

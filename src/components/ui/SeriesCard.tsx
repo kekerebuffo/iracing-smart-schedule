@@ -1,7 +1,9 @@
-import { Star, Timer, Thermometer, CloudRain, Flag, ShieldAlert, Car } from 'lucide-react';
+import { Star, Timer, Thermometer, CloudRain, Flag, ShieldAlert, Car, ChevronRight } from 'lucide-react';
 import { cn } from '@/components/layout/Sidebar';
 import { IRacingSeries, SeriesWeek } from '@/lib/scheduleProcessor';
 import { useLanguageStore } from '@/store/useLanguageStore';
+import { SeriesInfoModal } from './SeriesInfoModal';
+import { useState } from 'react';
 
 interface Props {
   series: IRacingSeries;
@@ -14,6 +16,7 @@ interface Props {
 
 export function SeriesCard({ series, currentWeek, isFavorite, onToggleFavorite, ownedCar, ownedTrack }: Props) {
   const { t } = useLanguageStore();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const isApto = ownedCar && ownedTrack;
   const getLicenseColor = (lic: string) => {
     switch (lic) {
@@ -115,7 +118,21 @@ export function SeriesCard({ series, currentWeek, isFavorite, onToggleFavorite, 
             </div>
           )}
         </div>
+
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="mt-4 w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-2 rounded-md text-[10px] uppercase tracking-widest transition-all border border-zinc-700/50 hover:border-zinc-600 flex items-center justify-center gap-2 group/btn"
+        >
+          Más información <ChevronRight className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
+        </button>
       </div>
+
+      <SeriesInfoModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        series={series}
+        currentWeek={currentWeek}
+      />
     </div>
   );
 }

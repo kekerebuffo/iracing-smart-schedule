@@ -8,7 +8,7 @@ export function getIRacingWeek() {
   const now = new Date();
   
   // Reference: Season 2, 2026 Week 1 starts March 10, 2026 00:00 UTC
-  const seasonStart = new Date(Date.UTC(2026, 2, 10, 0, 0, 0)); 
+  const seasonStart = new Date(Date.UTC(2026, 2, 17, 0, 0, 0)); 
   
   const diffMs = now.getTime() - seasonStart.getTime();
   const diffWeeks = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7)) + 1;
