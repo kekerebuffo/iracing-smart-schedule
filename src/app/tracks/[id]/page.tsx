@@ -4,9 +4,10 @@ import Link from 'next/link';
 import { ChevronLeft, Ruler, Flag, Globe, MapPin, CreditCard, Box } from 'lucide-react';
 import { TrackMapWrapper as TrackMap } from '@/components/tracks/TrackMapWrapper';
 
-export default async function TrackDetailPage({ params }: { params: { id: string } }) {
+export default async function TrackDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const tracks = await getTracks();
-  const track = tracks.find(t => t.track_id === params.id);
+  const track = tracks.find(t => t.track_id === id);
 
   if (!track) notFound();
 

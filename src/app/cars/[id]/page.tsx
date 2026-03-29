@@ -3,9 +3,10 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronLeft, Zap, Droplets, CreditCard, Box, Tag, Globe, MessageSquare } from 'lucide-react';
 
-export default async function CarDetailPage({ params }: { params: { id: string } }) {
+export default async function CarDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const cars = await getCars();
-  const car = cars.find(c => c.car_id === params.id);
+  const car = cars.find(c => c.car_id === id);
 
   if (!car) notFound();
 

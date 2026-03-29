@@ -7,9 +7,9 @@
 export function getIRacingWeek() {
   const now = new Date(); // Browser's local timestamp, but getTime() is universal UTC.
   
-  // Reference: Season 2, 2026 Week 1 starts March 10, 2026 00:00:00 UTC.
-  // JS Date.UTC uses month index (0-11). So March is 2.
-  const seasonStart = new Date(Date.UTC(2026, 2, 10, 0, 0, 0)); 
+  // Reference: Season 2, 2026 Week 1 starts March 17, 2026 00:00:00 UTC.
+  // JS Date.UTC uses month index (0-11). March = 2.
+  const seasonStart = new Date(Date.UTC(2026, 2, 17, 0, 0, 0)); 
   
   const diffMs = now.getTime() - seasonStart.getTime();
   const diffWeeks = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7)) + 1;

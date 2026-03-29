@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import Papa from 'papaparse';
 
-const DATA_DIR = path.join(process.cwd(), 'src', 'data');
+const DATA_DIR = path.join(process.cwd(), 'public', 'data');
 const CARS_CSV = path.join(DATA_DIR, 'iracing_cars.csv');
 const TRACKS_CSV = path.join(DATA_DIR, 'iracing_tracks.csv');
 
