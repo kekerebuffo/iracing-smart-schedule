@@ -4,7 +4,7 @@ import { IRacingSeries, SeriesWeek } from '@/lib/scheduleProcessor';
 import { useFilterStore } from '@/store/useFilterStore';
 import { getIRacingWeek } from '@/lib/dateUtils';
 import { useState } from 'react';
-import { Star } from 'lucide-react';
+import { Star, StarOff } from 'lucide-react';
 
 interface Props {
   schedule: IRacingSeries[];
@@ -14,11 +14,16 @@ interface Props {
 export function PlannerMatrix({ schedule, freeTracks = [] }: Props) {
   const currentWeekNum = getIRacingWeek();
   const [hoveredTrack, setHoveredTrack] = useState<string | null>(null);
-  
+  const [onlyFavorites, setOnlyFavorites] = useState(false);
+
   const { 
     ownedTracks, wishlistTracks, favorites, toggleFavorite,
     ownedCars, showOnlyOwned 
   } = useFilterStore();
+
+  const displayedSchedule = onlyFavorites
+    ? schedule.filter(s => favorites.includes(s.seriesName))
+    : schedule;
 
   const isFreeTrack = (trackName: string) => {
     if (freeTracks.some(t => trackName.includes(t) || t.includes(trackName))) return true;
@@ -41,6 +46,22 @@ export function PlannerMatrix({ schedule, freeTracks = [] }: Props) {
 
   return (
     <div className="w-full overflow-x-auto pb-6 custom-scrollbar animate-in fade-in zoom-in-95 duration-500">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest">
+          {displayedSchedule.length} series · {onlyFavorites ? 'Solo Favoritas' : 'Todas'}
+        </p>
+        <button
+          onClick={() => setOnlyFavorites(prev => !prev)}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg border font-bold text-sm transition-all ${
+            onlyFavorites
+              ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-400'
+              : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:text-yellow-400 hover:border-yellow-500/50'
+          }`}
+        >
+          {onlyFavorites ? <Star className="w-4 h-4" fill="currentColor" /> : <Star className="w-4 h-4" />}
+          Solo Favoritas
+        </button>
+      </div>
       <div className="min-w-[1400px]">
         <table className="w-full text-left text-sm whitespace-nowrap border-collapse">
           <thead>
@@ -56,7 +77,7 @@ export function PlannerMatrix({ schedule, freeTracks = [] }: Props) {
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-800/50">
-            {schedule.map((series, idx) => {
+            {displayedSchedule.map((series, idx) => {
               const isFav = favorites.includes(series.seriesName);
               // Map weeks 1-12
               const weeksMap = new Map<number, SeriesWeek>();

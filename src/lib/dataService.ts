@@ -4,9 +4,9 @@ import fs from 'fs';
 import path from 'path';
 import Papa from 'papaparse';
 
-const BASE_PATH = 'C:\\Users\\keker\\Desktop\\iracing project\\iracing api';
-const CARS_CSV = path.join(BASE_PATH, 'iracing_cars.csv');
-const TRACKS_CSV = path.join(BASE_PATH, 'iracing_tracks.csv');
+const DATA_DIR = path.join(process.cwd(), 'src', 'data');
+const CARS_CSV = path.join(DATA_DIR, 'iracing_cars.csv');
+const TRACKS_CSV = path.join(DATA_DIR, 'iracing_tracks.csv');
 
 export interface iRacingCar {
   car_id: string;

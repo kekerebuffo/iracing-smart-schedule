@@ -14,12 +14,22 @@ export default function CalendarPage() {
   // Get weeks from the first series as a reference
   const referenceWeeks = schedule.length > 0 ? schedule[0].weeks : [];
 
-  const getEndDate = (startDateStr: string) => {
-    const start = new Date(startDateStr);
-    const end = new Date(start);
-    end.setDate(start.getDate() + 6);
-    return end.toISOString().split('T')[0];
+  // Parse a YYYY-MM-DD string as UTC (not local time) to avoid timezone day-shifts
+  const parseUTC = (dateStr: string) => {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(Date.UTC(y, m - 1, d));
   };
+
+  const formatUTC = (date: Date) => date.toISOString().split('T')[0];
+
+  const getEndDate = (startDateStr: string) => {
+    const start = parseUTC(startDateStr);
+    // Week runs Tue → next Mon (6 days later)
+    const end = new Date(start.getTime() + 6 * 24 * 60 * 60 * 1000);
+    return formatUTC(end);
+  };
+
+  const displayStart = (dateStr: string) => formatUTC(parseUTC(dateStr));
 
   return (
     <div className="animate-in fade-in duration-500 max-w-[1000px] mx-auto pb-10">
@@ -72,7 +82,7 @@ export default function CalendarPage() {
                   
                   <div>
                     <div className="flex items-center gap-2 text-zinc-300 font-mono text-sm">
-                      <span className="bg-zinc-800 px-2 py-0.5 rounded text-xs">{wk.startDate}</span>
+                      <span className="bg-zinc-800 px-2 py-0.5 rounded text-xs">{displayStart(wk.startDate)}</span>
                       <ArrowRight className="w-3 h-3 text-zinc-600" />
                       <span className="bg-zinc-800 px-2 py-0.5 rounded text-xs">{endDate}</span>
                     </div>
