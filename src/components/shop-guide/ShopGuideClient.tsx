@@ -2,8 +2,8 @@
 
 import { IRacingSeries } from '@/lib/scheduleProcessor';
 import { useFilterStore } from '@/store/useFilterStore';
-import { ShoppingCart, Heart, CheckCircle2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { TrendingUp, CheckCircle2, Heart, Minus } from 'lucide-react';
+import { useMemo } from 'react';
 
 interface Props {
   schedule: IRacingSeries[];
@@ -12,13 +12,21 @@ interface Props {
 
 export function ShopGuideClient({ schedule, freeTracks = [] }: Props) {
   const { favorites, ownedTracks, wishlistTracks, showOnlyOwned, toggleWishlistTrack, toggleOwnedTrack } = useFilterStore();
-  
-  // Calculate track frequencies in favorite series
+
+  const isFreeTrack = (trackName: string) => {
+    if (freeTracks.some(ft => trackName.includes(ft) || ft.includes(trackName))) return true;
+    if (!showOnlyOwned) {
+      const legacyFree = ['Charlotte', 'USA International', 'Lanier', 'South Boston', 'Oulton', 'Tsukuba', 'Okayama', 'Summit Point', 'Lime Rock', 'Laguna Seca', 'Concord', 'Oxford', 'Centripetal'];
+      if (legacyFree.some(ft => trackName.includes(ft))) return true;
+    }
+    return false;
+  };
+
+  // Calculate track frequencies — now also showing owned ones for reference
   const trackStats = useMemo(() => {
     const stats: Record<string, { count: number, series: string[] }> = {};
-    
-    // Only analyze favorited series, unless none are favorited (then analyze all)
-    const targetSeries = favorites.length > 0 
+
+    const targetSeries = favorites.length > 0
       ? schedule.filter(s => favorites.includes(s.seriesName))
       : schedule;
 
@@ -26,18 +34,9 @@ export function ShopGuideClient({ schedule, freeTracks = [] }: Props) {
       if (!series.weeks) return;
       series.weeks.forEach(wk => {
         const tName = wk.trackName;
-        // Check if free
-        const isFree = freeTracks.some(ft => tName.includes(ft) || ft.includes(tName)) ||
-                       (!showOnlyOwned && ['Charlotte', 'USA International', 'Lanier', 'South Boston', 'Oulton', 'Tsukuba', 'Okayama', 'Summit Point', 'Lime Rock', 'Laguna Seca', 'Concord', 'Oxford', 'Centripetal'].some(ft => tName.includes(ft)));
-        
-        if (isFree) return; // Ignore free tracks from shop guide
+        if (isFreeTrack(tName)) return; // Free tracks don't need buying
 
-        const isOwned = ownedTracks.includes(tName);
-        if (isOwned) return; // Ignore owned tracks from shop guide recommendations
-        
-        if (!stats[tName]) {
-          stats[tName] = { count: 0, series: [] };
-        }
+        if (!stats[tName]) stats[tName] = { count: 0, series: [] };
         stats[tName].count += 1;
         if (!stats[tName].series.includes(series.seriesName)) {
           stats[tName].series.push(series.seriesName);
@@ -45,84 +44,123 @@ export function ShopGuideClient({ schedule, freeTracks = [] }: Props) {
       });
     });
 
-    // Sort by frequency
     return Object.entries(stats)
       .map(([trackName, data]) => ({ trackName, ...data }))
       .sort((a, b) => b.count - a.count);
   }, [schedule, favorites, ownedTracks, freeTracks, showOnlyOwned]);
 
+  const getTrackState = (trackName: string) => {
+    if (ownedTracks.includes(trackName)) return 'owned';
+    if (wishlistTracks.includes(trackName)) return 'wishlist';
+    return 'none';
+  };
+
   return (
     <div className="max-w-4xl mx-auto pb-10">
-      <div className="mb-8 border-b border-zinc-800 pb-6 flex items-start justify-between">
-        <div>
-          <h1 className="text-3xl font-black text-white uppercase flex items-center gap-3">
-            <ShoppingCart className="w-8 h-8 text-blue-500" />
-            Shop Guide
-          </h1>
-          <p className="text-zinc-400 mt-2">
-            Optimiza tus compras. Analizamos tus Series Favoritas y te listamos qué pistas de pago usarás más veces en esta temporada.
+      <div className="mb-8 border-b border-zinc-800 pb-6">
+        <h1 className="text-3xl font-black text-white uppercase flex items-center gap-3">
+          <TrendingUp className="w-8 h-8 text-blue-500" />
+          Optimizador de Compras
+        </h1>
+        <p className="text-zinc-400 mt-2">
+          Analizamos tus Series Favoritas y te mostramos qué circuitos de pago usarás más veces esta temporada.
+        </p>
+        {favorites.length === 0 && (
+          <p className="text-orange-400 text-sm font-bold mt-2">
+            ⚠️ No tienes Series Favoritas marcadas. Mostrando estadísticas de todo iRacing.
           </p>
-          {favorites.length === 0 && (
-            <p className="text-orange-400 text-sm font-bold mt-2">
-              ⚠️ No tienes Series Favoritas marcadas. Mostrando estadísticas de todo iRacing.
-            </p>
-          )}
+        )}
+
+        {/* Legend */}
+        <div className="flex flex-wrap items-center gap-4 mt-4 text-xs font-bold uppercase tracking-widest text-zinc-500">
+          <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-teal-400" /> Ya lo tengo</span>
+          <span className="flex items-center gap-2"><Heart className="w-4 h-4 text-blue-400" /> Lista de Deseados</span>
+          <span className="flex items-center gap-2"><Minus className="w-4 h-4 text-zinc-600" /> Sin marcar</span>
         </div>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-3">
         {trackStats.map((stat, idx) => {
-          const isWishlist = wishlistTracks.includes(stat.trackName);
+          const state = getTrackState(stat.trackName);
+          const isOwned = state === 'owned';
+          const isWishlist = state === 'wishlist';
+
           return (
-            <div 
+            <div
               key={stat.trackName}
-              className={`flex items-stretch justify-between rounded-xl border p-4 transition-colors ${
-                isWishlist ? 'bg-blue-950/20 border-blue-900/50' : 'bg-zinc-900/40 border-zinc-800 hover:border-zinc-700'
+              className={`flex items-stretch justify-between rounded-xl border p-4 transition-all ${
+                isOwned
+                  ? 'bg-teal-950/20 border-teal-800/50'
+                  : isWishlist
+                  ? 'bg-blue-950/20 border-blue-900/50'
+                  : 'bg-zinc-900/40 border-zinc-800 hover:border-zinc-700'
               }`}
             >
               <div className="flex-1">
                 <div className="flex items-center gap-3">
-                  <div className="bg-zinc-800 text-zinc-300 w-8 h-8 rounded flex items-center justify-center font-black">
+                  <div className="bg-zinc-800 text-zinc-300 w-8 h-8 rounded flex items-center justify-center font-black text-sm shrink-0">
                     #{idx + 1}
                   </div>
-                  <h3 className="text-xl font-bold text-white uppercase italic tracking-wider">
-                    {stat.trackName}
-                  </h3>
+                  <div>
+                    <h3 className={`text-lg font-bold uppercase italic tracking-wider ${isOwned ? 'text-teal-400' : isWishlist ? 'text-blue-300' : 'text-white'}`}>
+                      {stat.trackName}
+                    </h3>
+                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                      En {stat.series.length} serie{stat.series.length !== 1 ? 's' : ''} · {stat.count} semana{stat.count !== 1 ? 's' : ''}
+                    </p>
+                  </div>
                 </div>
-                
-                <div className="mt-3 text-sm text-zinc-400">
-                  <p className="font-bold text-zinc-500 mb-1 uppercase tracking-widest text-[10px]">Aparece en {stat.series.length} de tus series:</p>
-                  <ul className="list-disc pl-5 space-y-0.5">
-                    {stat.series.map(s => <li key={s} className="truncate max-w-[400px]">{s}</li>)}
-                  </ul>
+
+                <div className="mt-2 pl-11 text-sm text-zinc-500 flex flex-wrap gap-1">
+                  {stat.series.map(s => (
+                    <span key={s} className="bg-zinc-800/60 px-2 py-0.5 rounded text-[10px] truncate max-w-[220px]">{s}</span>
+                  ))}
                 </div>
               </div>
 
-              <div className="flex flex-col items-end gap-3 justify-between pl-4 border-l border-zinc-800/50">
-                <div className="text-right">
-                  <span className="text-3xl font-black text-white leading-none block">{stat.count}</span>
-                  <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest">Semanas Totales</span>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => toggleWishlistTrack(stat.trackName)}
-                    className={`p-2 rounded border font-bold text-xs uppercase transition-colors ${
-                      isWishlist 
-                      ? 'bg-blue-900 text-blue-200 border-blue-700 hover:bg-blue-800' 
-                      : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-blue-900/50 hover:text-blue-400'
-                    }`}
-                  >
-                    {isWishlist ? 'En Wishlist' : 'A Wishlist'}
-                  </button>
-                  <button
-                    onClick={() => toggleOwnedTrack(stat.trackName)}
-                    className="p-2 rounded border border-teal-800/50 bg-teal-950/30 text-teal-400 hover:bg-teal-900/50 hover:text-teal-300 font-bold text-xs uppercase transition-colors flex items-center gap-1"
-                  >
-                    <CheckCircle2 className="w-3 h-3" />
-                    Comprado
-                  </button>
-                </div>
+              {/* 3-state buttons */}
+              <div className="flex items-center gap-2 pl-4 border-l border-zinc-800/50 shrink-0">
+                {/* Ya lo tengo */}
+                <button
+                  onClick={() => {
+                    // If already owned, unmark it. Otherwise mark as owned (and remove from wishlist if it was there).
+                    if (isOwned) {
+                      toggleOwnedTrack(stat.trackName);
+                    } else {
+                      if (isWishlist) toggleWishlistTrack(stat.trackName); // remove from wishlist
+                      toggleOwnedTrack(stat.trackName);
+                    }
+                  }}
+                  title="Ya lo tengo"
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border font-bold text-xs uppercase transition-all ${
+                    isOwned
+                      ? 'bg-teal-600 border-teal-500 text-white'
+                      : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-teal-600/60 hover:text-teal-400'
+                  }`}
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  {isOwned ? 'Tengo' : 'Ya lo tengo'}
+                </button>
+
+                {/* Lista de Deseados */}
+                <button
+                  onClick={() => {
+                    if (isOwned) return; // Can't wishlist if already owned
+                    toggleWishlistTrack(stat.trackName);
+                  }}
+                  title={isOwned ? 'Ya tienes esta pista' : 'Lista de Deseados'}
+                  disabled={isOwned}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border font-bold text-xs uppercase transition-all ${
+                    isOwned
+                      ? 'opacity-30 cursor-not-allowed bg-zinc-800 border-zinc-700 text-zinc-500'
+                      : isWishlist
+                      ? 'bg-blue-600 border-blue-500 text-white'
+                      : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-blue-600/60 hover:text-blue-400'
+                  }`}
+                >
+                  <Heart className="w-3.5 h-3.5" fill={isWishlist && !isOwned ? 'currentColor' : 'none'} />
+                  {isWishlist && !isOwned ? 'Deseado' : 'Lista de Deseados'}
+                </button>
               </div>
             </div>
           );
@@ -130,7 +168,7 @@ export function ShopGuideClient({ schedule, freeTracks = [] }: Props) {
 
         {trackStats.length === 0 && (
           <div className="py-20 text-center text-zinc-500 font-bold uppercase tracking-widest border border-dashed border-zinc-800 rounded-xl">
-            No faltan pistas en tus series favoritas.
+            ¡No faltan pistas en tus series favoritas! 🎉
           </div>
         )}
       </div>
