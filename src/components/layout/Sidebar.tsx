@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Calendar, Flag, CalendarDays, Car, Map } from 'lucide-react';
+import { Home, Calendar, Flag, CalendarDays, Car, Map, ShoppingCart } from 'lucide-react';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -17,6 +17,7 @@ export default function Sidebar() {
 
   const links = [
     { href: '/', label: t('home'), icon: Home },
+    { href: '/shop-guide', label: 'Shop Guide', icon: ShoppingCart },
     { href: '/agenda', label: t('agenda'), icon: Calendar },
     { href: '/calendar', label: t('calendar'), icon: CalendarDays },
     { href: '/cars', label: t('cars'), icon: Car },

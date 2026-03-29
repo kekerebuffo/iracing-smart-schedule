@@ -4,9 +4,11 @@ import { useFilterStore } from '@/store/useFilterStore';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { FilterBar } from '@/components/filters/FilterBar';
 import { SeriesCard } from '@/components/ui/SeriesCard';
+import { PlannerMatrix } from '@/components/planner/PlannerMatrix';
 import { IRacingSeries, getCurrentWeek } from '@/lib/scheduleProcessor';
 import { isTuesdayAlertActive, getIRacingWeek, getSeasonInfo } from '@/lib/dateUtils';
-import { AlertTriangle, Calendar } from 'lucide-react';
+import { AlertTriangle, Calendar, LayoutGrid, TableProperties } from 'lucide-react';
+import { useState } from 'react';
 
 interface Props {
   schedule: IRacingSeries[];
@@ -23,6 +25,8 @@ export function DashboardClient({ schedule, freeCars = [], freeTracks = [] }: Pr
     licenses, types, favorites, toggleFavorite 
   } = useFilterStore();
   
+  const [viewMode, setViewMode] = useState<'matrix' | 'cards'>('matrix');
+
   const alertActive = isTuesdayAlertActive();
   const currentIRacingWeek = getIRacingWeek();
   const seasonInfo = getSeasonInfo();
@@ -107,9 +111,38 @@ export function DashboardClient({ schedule, freeCars = [], freeTracks = [] }: Pr
         </div>
       )}
 
-      <FilterBar />
+      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-4 mb-4">
+        <div className="flex-1">
+          <FilterBar />
+        </div>
+        <div className="flex bg-zinc-900 border border-zinc-800 rounded-lg p-1 shrink-0">
+          <button
+            onClick={() => setViewMode('matrix')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
+              viewMode === 'matrix' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'
+            }`}
+          >
+            <TableProperties className="w-4 h-4" />
+            Planificador
+          </button>
+          <button
+            onClick={() => setViewMode('cards')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
+              viewMode === 'cards' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'
+            }`}
+          >
+            <LayoutGrid className="w-4 h-4" />
+            Tarjetas
+          </button>
+        </div>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+      {viewMode === 'matrix' ? (
+        <div className="bg-zinc-950/50 border border-zinc-800/50 rounded-xl overflow-hidden p-4 shadow-xl">
+          <PlannerMatrix schedule={filteredSchedule} freeTracks={freeTracks} />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
         {filteredSchedule.map((series, idx) => {
           const currentWk = getCurrentWeek(series);
           const isFav = favorites.includes(series.seriesName);
@@ -131,6 +164,7 @@ export function DashboardClient({ schedule, freeCars = [], freeTracks = [] }: Pr
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }

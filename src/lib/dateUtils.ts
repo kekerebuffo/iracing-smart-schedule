@@ -1,19 +1,20 @@
 /**
  * iRacing Week Calculation Utility
- * Weeks start on Tuesday at 00:00 UTC.
- * Season 2, 2026 starts on March 10, 2026.
+ * Weeks strictly start/end on Tuesday at 00:00 UTC.
+ * Season 2, 2026 starts precisely on March 10, 2026 00:00:00 UTC.
  */
 
 export function getIRacingWeek() {
-  const now = new Date();
+  const now = new Date(); // Browser's local timestamp, but getTime() is universal UTC.
   
-  // Reference: Season 2, 2026 Week 1 starts March 10, 2026 00:00 UTC
-  const seasonStart = new Date(Date.UTC(2026, 2, 17, 0, 0, 0)); 
+  // Reference: Season 2, 2026 Week 1 starts March 10, 2026 00:00:00 UTC.
+  // JS Date.UTC uses month index (0-11). So March is 2.
+  const seasonStart = new Date(Date.UTC(2026, 2, 10, 0, 0, 0)); 
   
   const diffMs = now.getTime() - seasonStart.getTime();
   const diffWeeks = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7)) + 1;
   
-  // Basic range check
+  // Basic range check (clamp between 1 and 13)
   if (diffWeeks < 1) return 1;
   if (diffWeeks > 13) return 13;
   

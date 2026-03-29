@@ -7,6 +7,8 @@ interface FilterState {
   showOnlyOwned: boolean;
   ownedCars: string[];
   ownedTracks: string[];
+  wishlistCars: string[];
+  wishlistTracks: string[];
   licenses: string[];
   types: string[];
   favorites: string[];
@@ -19,6 +21,8 @@ interface FilterState {
   toggleFavorite: (seriesId: string) => void;
   toggleOwnedCar: (car: string) => void;
   toggleOwnedTrack: (track: string) => void;
+  toggleWishlistCar: (car: string) => void;
+  toggleWishlistTrack: (track: string) => void;
   userEmail: string | null;
   setUserEmail: (email: string | null) => void;
 }
@@ -31,6 +35,8 @@ export const useFilterStore = create<FilterState>()(
       showOnlyOwned: false,
       ownedCars: [],
       ownedTracks: [],
+      wishlistCars: [],
+      wishlistTracks: [],
       licenses: [],
       types: [],
       favorites: [],
@@ -64,6 +70,16 @@ export const useFilterStore = create<FilterState>()(
         ownedTracks: state.ownedTracks.includes(track)
           ? state.ownedTracks.filter(t => t !== track)
           : [...state.ownedTracks, track]
+      })),
+      toggleWishlistCar: (car) => set((state) => ({
+        wishlistCars: state.wishlistCars.includes(car) 
+          ? state.wishlistCars.filter(c => c !== car)
+          : [...state.wishlistCars, car]
+      })),
+      toggleWishlistTrack: (track) => set((state) => ({
+        wishlistTracks: state.wishlistTracks.includes(track)
+          ? state.wishlistTracks.filter(t => t !== track)
+          : [...state.wishlistTracks, track]
       }))
     }),
     {
