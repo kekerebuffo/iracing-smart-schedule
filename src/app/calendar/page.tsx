@@ -24,8 +24,8 @@ export default function CalendarPage() {
 
   const getEndDate = (startDateStr: string) => {
     const start = parseUTC(startDateStr);
-    // Week runs Tue → next Mon (6 days later)
-    const end = new Date(start.getTime() + 6 * 24 * 60 * 60 * 1000);
+    // Week runs Tue → Tue (7 days). End date = start of next week.
+    const end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
     return formatUTC(end);
   };
 
