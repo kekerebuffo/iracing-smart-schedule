@@ -1,7 +1,8 @@
 'use client'
 
-import { Bell, User, Languages, LogOut } from 'lucide-react';
+import { Bell, User, Languages, LogOut, Menu } from 'lucide-react';
 import { useLanguageStore } from '@/store/useLanguageStore';
+import { useSidebarStore } from '@/store/useSidebarStore';
 import { useSession, signOut } from 'next-auth/react';
 import { isTuesdayAlertActive } from '@/lib/dateUtils';
 import { useState } from 'react';
@@ -9,12 +10,20 @@ import { useState } from 'react';
 export default function Header() {
   const { language, setLanguage, t } = useLanguageStore();
   const { data: session } = useSession();
+  const { toggle } = useSidebarStore();
   const alertActive = isTuesdayAlertActive();
   const [showAlert, setShowAlert] = useState(false);
 
   return (
     <header className="h-16 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800 flex items-center justify-between px-6 sticky top-0 z-20">
-      <div className="flex-1" />
+      <div className="flex items-center gap-4">
+        <button 
+          onClick={toggle}
+          className="lg:hidden p-2 -ml-2 text-zinc-400 hover:text-white transition-colors"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+      </div>
       <div className="flex items-center space-x-3">
 
         {/* Notification Bell (Tuesday Reset Alert) */}

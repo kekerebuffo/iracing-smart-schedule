@@ -8,8 +8,8 @@ import { Providers } from '@/components/Providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'iRacing Smart Schedule',
-  description: 'Advanced scheduling and telemetry dashboard for iRacing',
+  title: 'ZazoApp - iRacing Smart Sched',
+  description: 'Advanced scheduling and telemetry dashboard for iRacing by ZazoApp',
 };
 
 export default function RootLayout({
@@ -43,11 +43,11 @@ async function LayoutWrapper({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen overflow-hidden">
+    <div className="flex min-h-screen relative overflow-x-hidden">
       <Sidebar />
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-screen min-w-0 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto bg-zinc-950 p-6 selection:bg-red-900/40">
+        <main className="flex-1 overflow-y-auto bg-zinc-950 p-4 md:p-6 selection:bg-red-900/40">
           {children}
         </main>
       </div>
