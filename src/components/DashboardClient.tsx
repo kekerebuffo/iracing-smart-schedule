@@ -16,9 +16,10 @@ interface Props {
   ownedTracks: number[]; 
   freeCars: string[];
   freeTracks: string[];
+  initialView?: 'matrix' | 'cards';
 }
 
-export function DashboardClient({ schedule, freeCars = [], freeTracks = [] }: Props) {
+export function DashboardClient({ schedule, freeCars = [], freeTracks = [], initialView = 'cards' }: Props) {
   const { t } = useLanguageStore();
   const { 
     ownedOnly, ownedCarsOnly, 
@@ -26,7 +27,7 @@ export function DashboardClient({ schedule, freeCars = [], freeTracks = [] }: Pr
     licenses, types, favorites, toggleFavorite 
   } = useFilterStore();
   
-  const [viewMode, setViewMode] = useState<'matrix' | 'cards'>('matrix');
+  const [viewMode, setViewMode] = useState<'matrix' | 'cards'>(initialView);
 
   const alertActive = isTuesdayAlertActive();
   const currentIRacingWeek = getIRacingWeek();
@@ -120,30 +121,31 @@ export function DashboardClient({ schedule, freeCars = [], freeTracks = [] }: Pr
       </div>
 
 
-      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-4 mb-4">
-        <div className="flex-1">
-          <FilterBar />
-        </div>
-        <div className="flex bg-zinc-900 border border-zinc-800 rounded-lg p-1 shrink-0">
-          <button
-            onClick={() => setViewMode('matrix')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
-              viewMode === 'matrix' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'
-            }`}
-          >
-            <TableProperties className="w-4 h-4" />
-            Planificador
-          </button>
+      {!initialView && (
+        <div className="flex bg-zinc-900 border border-zinc-800 rounded-lg p-1 shrink-0 w-fit mb-4">
           <button
             onClick={() => setViewMode('cards')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-colors ${
-              viewMode === 'cards' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
+              viewMode === 'cards' ? 'bg-red-600 text-white shadow-md' : 'text-zinc-500 hover:text-zinc-300'
             }`}
           >
             <LayoutGrid className="w-4 h-4" />
-            Carreras Disponibles AHORA
+            {t('races_now')}
+          </button>
+          <button
+            onClick={() => setViewMode('matrix')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${
+              viewMode === 'matrix' ? 'bg-red-600 text-white shadow-md' : 'text-zinc-500 hover:text-zinc-300'
+            }`}
+          >
+            <TableProperties className="w-4 h-4" />
+            {t('planner')}
           </button>
         </div>
+      )}
+      
+      <div className="flex-1 mb-8">
+        <FilterBar />
       </div>
 
       {viewMode === 'matrix' ? (

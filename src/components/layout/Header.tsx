@@ -23,6 +23,11 @@ export default function Header() {
         >
           <Menu className="w-6 h-6" />
         </button>
+        {/* Mobile Logo */}
+        <div className="lg:hidden flex items-center gap-2">
+          <img src="/logo.jpg" alt="ZazoApp" className="w-8 h-8 rounded-full border border-red-600/50" />
+          <span className="text-sm font-black tracking-tighter uppercase italic text-white">ZazoApp</span>
+        </div>
       </div>
       <div className="flex items-center space-x-3">
 

@@ -119,7 +119,7 @@ export function ShopGuideClient({ schedule, freeTracks = [] }: Props) {
               </div>
 
               {/* 3-state buttons */}
-              <div className="flex items-center gap-2 pl-4 border-l border-zinc-800/50 shrink-0">
+              <div className="flex flex-col sm:flex-row items-center gap-2 pl-4 border-l border-zinc-800/50 shrink-0">
                 {/* Ya lo tengo */}
                 <button
                   onClick={() => {
@@ -132,7 +132,7 @@ export function ShopGuideClient({ schedule, freeTracks = [] }: Props) {
                     }
                   }}
                   title="Ya lo tengo"
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border font-bold text-xs uppercase transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border font-bold text-[10px] sm:text-xs uppercase transition-all w-full sm:w-auto justify-center ${
                     isOwned
                       ? 'bg-teal-600 border-teal-500 text-white'
                       : 'bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-teal-600/60 hover:text-teal-400'
@@ -150,7 +150,7 @@ export function ShopGuideClient({ schedule, freeTracks = [] }: Props) {
                   }}
                   title={isOwned ? 'Ya tienes esta pista' : 'Lista de Deseados'}
                   disabled={isOwned}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border font-bold text-xs uppercase transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border font-bold text-[10px] sm:text-xs uppercase transition-all w-full sm:w-auto justify-center ${
                     isOwned
                       ? 'opacity-30 cursor-not-allowed bg-zinc-800 border-zinc-700 text-zinc-500'
                       : isWishlist

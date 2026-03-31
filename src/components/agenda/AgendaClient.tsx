@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useFilterStore } from '@/store/useFilterStore';
 import { getCurrentWeek, IRacingSeries, SeriesWeek } from '@/lib/scheduleProcessor';
+import { useLanguageStore } from '@/store/useLanguageStore';
 import { isTuesdayAlertActive } from '@/lib/dateUtils';
 import { cn } from '@/components/layout/Sidebar';
 import { Clock, Star, CalendarDays, ListTree, Timer, Thermometer, CloudRain, Flag, Car, Info, ChevronRight } from 'lucide-react';
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function AgendaClient({ schedule, freeCars = [], freeTracks = [] }: Props) {
+  const { t } = useLanguageStore();
   const { favorites, showOnlyOwned, ownedCars, ownedTracks } = useFilterStore();
   const alertActive = isTuesdayAlertActive();
   const [viewMode, setViewMode] = useState<'series' | 'calendar'>('series');
@@ -69,8 +71,8 @@ export function AgendaClient({ schedule, freeCars = [], freeTracks = [] }: Props
     <div className="animate-in fade-in duration-500 max-w-[1600px] mx-auto pb-10">
       <div className="flex items-center justify-between mb-8 border-b border-zinc-800 pb-6">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-white mb-1 uppercase">Favorite Agenda</h1>
-          <p className="text-zinc-400 font-medium">Track the upcoming weeks for your favorite series.</p>
+          <h1 className="text-3xl font-black tracking-tight text-white mb-1 uppercase">{t('favorite_agenda')}</h1>
+          <p className="text-zinc-400 font-medium">{t('favorite_agenda_desc')}</p>
         </div>
         
         {favoriteSeries.length > 0 && (
@@ -79,13 +81,13 @@ export function AgendaClient({ schedule, freeCars = [], freeTracks = [] }: Props
               onClick={() => setViewMode('series')}
               className={cn("flex items-center gap-2 px-4 py-2 rounded-md font-bold text-[11px] uppercase tracking-wider transition-all", viewMode === 'series' ? "bg-red-600 text-white shadow-md" : "text-zinc-500 hover:text-zinc-300")}
             >
-              <ListTree className="w-4 h-4" /> Series Layout
+              <ListTree className="w-4 h-4" /> {t('series_layout')}
             </button>
             <button
               onClick={() => setViewMode('calendar')}
               className={cn("flex items-center gap-2 px-4 py-2 rounded-md font-bold text-[11px] uppercase tracking-wider transition-all", viewMode === 'calendar' ? "bg-red-600 text-white shadow-md" : "text-zinc-500 hover:text-zinc-300")}
             >
-              <CalendarDays className="w-4 h-4" /> Timeline Layout
+              <CalendarDays className="w-4 h-4" /> {t('timeline_layout')}
             </button>
           </div>
         )}
@@ -94,8 +96,8 @@ export function AgendaClient({ schedule, freeCars = [], freeTracks = [] }: Props
       {favoriteSeries.length === 0 ? (
         <div className="py-20 text-center border border-dashed border-zinc-800 rounded-xl bg-zinc-900/30">
           <Star className="w-12 h-12 text-zinc-700 mx-auto mb-4" />
-          <p className="text-zinc-500 font-bold uppercase tracking-widest">You have no favorited series yet.</p>
-          <p className="text-sm text-zinc-600 mt-2">Go to the Dashboard and click the star icon on series you want to track.</p>
+          <p className="text-zinc-500 font-bold uppercase tracking-widest">{t('no_favorites')}</p>
+          <p className="text-sm text-zinc-600 mt-2">{t('no_favorites_desc')}</p>
         </div>
       ) : (
         viewMode === 'series' ? (

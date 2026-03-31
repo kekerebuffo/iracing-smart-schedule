@@ -1,6 +1,7 @@
 'use client'
 
 import { useFilterStore } from '@/store/useFilterStore';
+import { useLanguageStore } from '@/store/useLanguageStore';
 import { cn } from '@/components/layout/Sidebar';
 import { Car, Map, Check, ChevronRight, Search } from 'lucide-react';
 import { useState, useMemo } from 'react';
@@ -13,7 +14,9 @@ interface Props {
 }
 
 export default function GarageClient({ cars, tracks }: Props) {
+  const { t } = useLanguageStore();
   const { ownedCars, ownedTracks, toggleOwnedCar, toggleOwnedTrack } = useFilterStore();
+  const [viewType, setViewType] = useState<'collection' | 'setup'>('collection');
   const [activeTab, setActiveTab] = useState<'cars' | 'tracks'>('cars');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -58,78 +61,145 @@ export default function GarageClient({ cars, tracks }: Props) {
         
         <div className="flex bg-zinc-900/80 p-1 rounded-xl border border-zinc-800 shadow-2xl">
           <button
-            onClick={() => setActiveTab('cars')}
+            onClick={() => setViewType('collection')}
             className={cn(
               "flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold text-sm transition-all uppercase tracking-widest",
-              activeTab === 'cars' ? "bg-indigo-600 text-white shadow-lg" : "text-zinc-500 hover:text-white"
+              viewType === 'collection' ? "bg-red-600 text-white shadow-lg shadow-red-900/20" : "text-zinc-500 hover:text-white"
             )}
           >
-            <Car className="w-4 h-4" /> Coches
+            {t('my_collection')}
           </button>
           <button
-            onClick={() => setActiveTab('tracks')}
+            onClick={() => setViewType('setup')}
             className={cn(
               "flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold text-sm transition-all uppercase tracking-widest",
-              activeTab === 'tracks' ? "bg-indigo-600 text-white shadow-lg" : "text-zinc-500 hover:text-white"
+              viewType === 'setup' ? "bg-red-600 text-white shadow-lg shadow-red-900/20" : "text-zinc-500 hover:text-white"
             )}
           >
-            <Map className="w-4 h-4" /> Circuitos
+            {t('setup_content')}
           </button>
         </div>
       </div>
 
-      <div className="relative mb-8 group">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-indigo-400 transition-colors" />
-        <input 
-          type="text"
-          placeholder={activeTab === 'cars' ? "Buscar coche..." : "Buscar circuito..."}
-          className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl py-4 pl-12 pr-6 text-white placeholder:text-zinc-600 focus:outline-none focus:border-indigo-600/50 focus:bg-zinc-900 transition-all text-lg font-medium shadow-inner"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
+      {viewType === 'setup' ? (
+        <>
+          <div className="flex bg-zinc-900 border border-zinc-800 rounded-lg p-1 shrink-0 w-fit mb-8">
+            <button
+              onClick={() => setActiveTab('cars')}
+              className={cn(
+                "flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold text-sm transition-all uppercase tracking-widest",
+                activeTab === 'cars' ? "bg-indigo-600 text-white shadow-lg" : "text-zinc-500 hover:text-white"
+              )}
+            >
+              <Car className="w-4 h-4" /> Coches
+            </button>
+            <button
+              onClick={() => setActiveTab('tracks')}
+              className={cn(
+                "flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold text-sm transition-all uppercase tracking-widest",
+                activeTab === 'tracks' ? "bg-indigo-600 text-white shadow-lg" : "text-zinc-500 hover:text-white"
+              )}
+            >
+              <Map className="w-4 h-4" /> Circuitos
+            </button>
+          </div>
 
-      {activeTab === 'cars' && searchQuery === '' ? (
-        <div className="space-y-12">
-          {Object.entries(groupedCars).map(([groupName, groupCars]) => (
-            <div key={groupName} className="relative">
-              <div className="flex items-center gap-4 mb-6">
-                <h2 className="text-xl font-black text-indigo-400 uppercase tracking-[0.2em] italic shrink-0">{groupName.replace('_', ' ')}</h2>
-                <div className="h-px bg-gradient-to-r from-indigo-900/50 to-transparent flex-1" />
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {groupCars.map(car => (
-                  <ContentCard 
-                    key={car.car_id}
-                    name={car.car_name}
-                    isOwned={ownedCars.includes(car.car_name)}
-                    onToggle={() => toggleOwnedCar(car.car_name)}
-                    type="car"
-                    isFree={car.free_with_subscription === 'TRUE'}
-                  />
-                ))}
-              </div>
+          <div className="relative mb-8 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-indigo-400 transition-colors" />
+            <input 
+              type="text"
+              placeholder={activeTab === 'cars' ? "Buscar coche..." : "Buscar circuito..."}
+              className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl py-4 pl-12 pr-6 text-white placeholder:text-zinc-600 focus:outline-none focus:border-indigo-600/50 focus:bg-zinc-900 transition-all text-lg font-medium shadow-inner"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          {activeTab === 'cars' && searchQuery === '' ? (
+            <div className="space-y-12">
+              {Object.entries(groupedCars).map(([groupName, groupCars]) => (
+                <div key={groupName} className="relative">
+                  <div className="flex items-center gap-4 mb-6">
+                    <h2 className="text-xl font-black text-indigo-400 uppercase tracking-[0.2em] italic shrink-0">{groupName.replace('_', ' ')}</h2>
+                    <div className="h-px bg-gradient-to-r from-indigo-900/50 to-transparent flex-1" />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {groupCars.map(car => (
+                      <ContentCard 
+                        key={car.car_id}
+                        name={car.car_name}
+                        isOwned={ownedCars.includes(car.car_name)}
+                        onToggle={() => toggleOwnedCar(car.car_name)}
+                        type="car"
+                        isFree={car.free_with_subscription === 'TRUE'}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {(activeTab === 'cars' ? filteredCars : filteredTracks).map(item => {
+                const name = 'car_name' in item ? item.car_name : item.track_name;
+                const id = 'car_id' in item ? item.car_id : item.track_id;
+                const isFree = item.free_with_subscription === 'TRUE';
+                return (
+                  <ContentCard 
+                    key={id}
+                    name={name}
+                    isOwned={activeTab === 'cars' ? ownedCars.includes(name) : ownedTracks.includes(name)}
+                    onToggle={() => activeTab === 'cars' ? toggleOwnedCar(name) : toggleOwnedTrack(name)}
+                    type={activeTab === 'cars' ? "car" : "track"}
+                    isFree={isFree}
+                  />
+                );
+              })}
+            </div>
+          )}
+        </>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {(activeTab === 'cars' ? filteredCars : filteredTracks).map(item => {
-            const name = 'car_name' in item ? item.car_name : item.track_name;
-            const id = 'car_id' in item ? item.car_id : item.track_id;
-            const isFree = item.free_with_subscription === 'TRUE';
-            return (
-              <ContentCard 
-                key={id}
-                name={name}
-                isOwned={activeTab === 'cars' ? ownedCars.includes(name) : ownedTracks.includes(name)}
-                onToggle={() => activeTab === 'cars' ? toggleOwnedCar(name) : toggleOwnedTrack(name)}
-                type={activeTab === 'cars' ? "car" : "track"}
-                isFree={isFree}
-              />
-            );
-          })}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          {/* Owned Cars */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-4 mb-4 border-b border-zinc-800 pb-4">
+              <Car className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-xl font-black text-white uppercase italic tracking-wider">Mis Coches ({ownedCars.length})</h2>
+            </div>
+            <div className="grid gap-2">
+              {ownedCars.length === 0 ? (
+                <p className="text-zinc-600 italic">No has seleccionado ningún coche de pago.</p>
+              ) : (
+                ownedCars.sort().map(car => (
+                  <div key={car} className="bg-zinc-900/50 p-3 rounded-lg border border-zinc-800 flex items-center justify-between group">
+                    <span className="text-zinc-300 font-bold text-sm uppercase italic">{car}</span>
+                    <button onClick={() => toggleOwnedCar(car)} className="text-[10px] text-zinc-600 hover:text-red-500 font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity">Eliminar</button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Owned Tracks */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-4 mb-4 border-b border-zinc-800 pb-4">
+              <Map className="w-5 h-5 text-teal-400" />
+              <h2 className="text-xl font-black text-white uppercase italic tracking-wider">Mis Circuitos ({ownedTracks.length})</h2>
+            </div>
+            <div className="grid gap-2">
+              {ownedTracks.length === 0 ? (
+                <p className="text-zinc-600 italic">No has seleccionado ningún circuito de pago.</p>
+              ) : (
+                ownedTracks.sort().map(track => (
+                  <div key={track} className="bg-zinc-900/50 p-3 rounded-lg border border-zinc-800 flex items-center justify-between group">
+                    <span className="text-zinc-300 font-bold text-sm uppercase italic">{track}</span>
+                    <button onClick={() => toggleOwnedTrack(track)} className="text-[10px] text-zinc-600 hover:text-red-500 font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity">Eliminar</button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
       )}
 

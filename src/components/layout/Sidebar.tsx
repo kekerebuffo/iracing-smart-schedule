@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Calendar, Flag, CalendarDays, Car, Map, ShoppingCart, Menu, X } from 'lucide-react';
+import { Home, Calendar, Flag, CalendarDays, Car, Map, ShoppingCart, Menu, X, LayoutGrid, TableProperties } from 'lucide-react';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { useSidebarStore } from '@/store/useSidebarStore';
 import { clsx, type ClassValue } from "clsx";
@@ -19,6 +19,7 @@ export default function Sidebar() {
 
   const links = [
     { href: '/', label: t('home'), icon: Home },
+    { href: '/planner', label: t('planner'), icon: LayoutGrid },
     { href: '/shop-guide', label: 'Guía de Compras V2', icon: ShoppingCart },
     { href: '/agenda', label: t('agenda'), icon: Calendar },
     { href: '/calendar', label: t('calendar'), icon: CalendarDays },

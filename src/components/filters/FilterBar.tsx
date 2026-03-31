@@ -38,14 +38,14 @@ export function FilterBar() {
   const hasOwnedContent = ownedCars.length > 0 || ownedTracks.length > 0;
 
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-5 mb-8 flex flex-col xl:flex-row gap-6 items-start xl:items-center">
+    <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-5 mb-8 flex flex-col xl:flex-row gap-6 items-start xl:items-center overflow-hidden">
       
       <div className="space-y-3 shrink-0">
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">{t('content_check')}</span>
         </div>
         
-        <div className="flex items-center gap-3 w-full lg:w-auto">
+        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
           <Link 
             href="/garage"
             className={cn(

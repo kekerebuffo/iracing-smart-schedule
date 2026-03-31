@@ -46,6 +46,16 @@ const dictionaries = {
     tracks: "Tracks",
     rain: "Rain",
     cautions: "Caut",
+    favorite_agenda: "Favorite Agenda",
+    favorite_agenda_desc: "Track the upcoming weeks for your favorite series.",
+    no_favorites: "You have no favorited series yet.",
+    no_favorites_desc: "Go to the Dashboard and click the star icon on series you want to track.",
+    series_layout: "Series Layout",
+    timeline_layout: "Timeline Layout",
+    planner: "Season Planner",
+    races_now: "Races Available NOW",
+    my_collection: "My Collection",
+    setup_content: "Setup Content",
   },
   es: {
     dashboard: "Panel de Carreras",
@@ -83,6 +93,16 @@ const dictionaries = {
     tracks: "Circuitos",
     rain: "Lluvia",
     cautions: "Caut",
+    favorite_agenda: "Mi Agenda de Favoritos",
+    favorite_agenda_desc: "Sigue las próximas semanas de tus series favoritas.",
+    no_favorites: "Aún no tienes series favoritas.",
+    no_favorites_desc: "Ve al Panel Principal y pulsa en la estrella de las series que quieras seguir.",
+    series_layout: "Vista por Series",
+    timeline_layout: "Línea de Tiempo",
+    planner: "Planificador de Temporada",
+    races_now: "Carreras Disponibles AHORA",
+    my_collection: "Mi Colección",
+    setup_content: "Configurar",
   }
 };
 
