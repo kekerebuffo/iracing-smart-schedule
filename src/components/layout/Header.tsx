@@ -3,6 +3,7 @@
 import { Bell, User, Languages, LogOut, Menu } from 'lucide-react';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { useSidebarStore } from '@/store/useSidebarStore';
+import { useFilterStore } from '@/store/useFilterStore';
 import { useSession, signOut } from 'next-auth/react';
 import { isTuesdayAlertActive } from '@/lib/dateUtils';
 import { useState } from 'react';
@@ -11,6 +12,7 @@ export default function Header() {
   const { language, setLanguage, t } = useLanguageStore();
   const { data: session } = useSession();
   const { toggle } = useSidebarStore();
+  const { pilotName, pilotNationality } = useFilterStore();
   const alertActive = isTuesdayAlertActive();
   const [showAlert, setShowAlert] = useState(false);
 
@@ -24,12 +26,12 @@ export default function Header() {
           <Menu className="w-6 h-6" />
         </button>
         {/* Mobile Logo */}
-        <div className="lg:hidden flex items-center gap-2">
-          <img src="/logo.jpg" alt="ZazoApp" className="w-8 h-8 rounded-full border border-red-600/50" />
-          <span className="text-sm font-black tracking-tighter uppercase italic text-white">ZazoApp</span>
+        <div className="lg:hidden flex items-center gap-2 max-w-[100px] overflow-hidden">
+          <img src="/logo.jpg" alt="ZazoApp" className="w-7 h-7 rounded-full border border-red-600/50 shrink-0" />
+          <span className="text-xs font-black tracking-tighter uppercase italic text-white truncate">ZazoApp</span>
         </div>
       </div>
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-2 sm:space-x-4">
 
         {/* Notification Bell (Tuesday Reset Alert) */}
         <div className="relative">
@@ -70,9 +72,24 @@ export default function Header() {
           <span className="text-xs font-bold uppercase tracking-wider">{language}</span>
         </button>
 
-        <div className="bg-zinc-900/80 px-3 py-1.5 rounded-full border border-zinc-800 flex items-center space-x-2">
-          <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse" />
-          <span className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">iR API Connected</span>
+        <div className="bg-zinc-900/80 px-3 py-1.5 rounded-full border border-zinc-800 flex items-center space-x-3 hover:border-indigo-500/30 transition-colors cursor-default">
+          <div className="flex items-center gap-1.5">
+            <span className="text-lg leading-none filter drop-shadow-sm">
+              {pilotNationality === 'ES' ? '🇪🇸' : 
+               pilotNationality === 'US' ? '🇺🇸' : 
+               pilotNationality === 'GB' ? '🇬🇧' : 
+               pilotNationality === 'DE' ? '🇩🇪' : 
+               pilotNationality === 'FR' ? '🇫🇷' : 
+               pilotNationality === 'IT' ? '🇮🇹' : 
+               pilotNationality === 'BR' ? '🇧🇷' : 
+               pilotNationality === 'AR' ? '🇦🇷' : 
+               pilotNationality === 'MX' ? '🇲🇽' : '🏁'}
+            </span>
+            <span className="text-xs font-black text-white uppercase tracking-wider max-w-[80px] sm:max-w-[120px] truncate">
+              {pilotName}
+            </span>
+          </div>
+          <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse shrink-0" />
         </div>
 
         {session?.user && (

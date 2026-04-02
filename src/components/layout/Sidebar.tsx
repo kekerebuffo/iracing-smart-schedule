@@ -18,8 +18,9 @@ export default function Sidebar() {
   const { isOpen, close } = useSidebarStore();
 
   const links = [
+    { href: '/garage', label: t('garage'), icon: Car, color: 'text-indigo-400', border: 'border-indigo-500/20' },
+    { href: '/planner', label: t('planner'), icon: LayoutGrid, color: 'text-yellow-500', border: 'border-yellow-500/20' },
     { href: '/', label: t('home'), icon: Home },
-    { href: '/planner', label: t('planner'), icon: LayoutGrid },
     { href: '/shop-guide', label: 'Guía de Compras V2', icon: ShoppingCart },
     { href: '/agenda', label: t('agenda'), icon: Calendar },
     { href: '/calendar', label: t('calendar'), icon: CalendarDays },
@@ -65,11 +66,25 @@ export default function Sidebar() {
                 "flex items-center space-x-3 px-3 py-2.5 rounded-md transition-all duration-200 border group",
                 isActive 
                   ? "bg-zinc-800 border-zinc-700 text-white shadow-sm" 
-                  : "border-transparent text-zinc-400 hover:text-white hover:bg-zinc-800/50 hover:border-zinc-700/50"
+                  : cn(
+                      "border-transparent text-zinc-400 hover:text-white hover:bg-zinc-800/50 hover:border-zinc-700/50",
+                      link.border && "hover:border-opacity-100"
+                    )
               )}
             >
-              <Icon className={cn("w-5 h-5", isActive ? "text-red-500" : "group-hover:text-zinc-300")} />
-              <span className="font-medium">{link.label}</span>
+              <Icon className={cn(
+                "w-5 h-5", 
+                isActive 
+                  ? (link.color ? link.color : "text-red-500") 
+                  : (link.color ? `${link.color} opacity-70 group-hover:opacity-100` : "group-hover:text-zinc-300")
+              )} />
+              <span className={cn(
+                "font-medium",
+                !isActive && link.color && "text-zinc-300"
+              )}>{link.label}</span>
+              {link.href === '/planner' && (
+                <span className="ml-auto flex h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
+              )}
             </Link>
           );
         })}

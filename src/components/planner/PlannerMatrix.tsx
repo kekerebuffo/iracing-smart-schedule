@@ -66,8 +66,8 @@ export function PlannerMatrix({ schedule, freeTracks = [] }: Props) {
         <table className="w-full text-left text-sm whitespace-nowrap border-collapse">
           <thead>
             <tr className="bg-zinc-900/80 border-y border-zinc-800 text-zinc-400">
-              <th className="py-3 px-4 font-bold uppercase tracking-wider w-10 text-center rounded-tl-xl border-l border-zinc-800">★</th>
-              <th className="py-3 px-4 font-bold uppercase tracking-wider">Series Name</th>
+              <th className="py-3 px-4 font-bold uppercase tracking-wider w-10 text-center rounded-tl-xl border-l border-zinc-800 sticky left-0 z-30 bg-zinc-900">★</th>
+              <th className="py-3 px-4 font-bold uppercase tracking-wider sticky left-14 z-30 bg-zinc-900 shadow-[2px_0_5px_rgba(0,0,0,0.3)]">Series Name</th>
               <th className="py-3 px-4 font-bold uppercase tracking-wider w-16 text-center">Lic</th>
               {Array.from({ length: 12 }).map((_, i) => (
                 <th key={i} className={`py-3 px-2 font-bold uppercase tracking-wider text-center w-[6%] border-l border-zinc-800/50 ${currentWeekNum === i + 1 ? 'text-red-500 bg-red-950/20' : ''}`}>
@@ -87,7 +87,7 @@ export function PlannerMatrix({ schedule, freeTracks = [] }: Props) {
 
               return (
                 <tr key={`${series.seriesName}-${idx}`} className="hover:bg-zinc-800/30 transition-colors group">
-                  <td className="py-2 px-4 text-center border-l border-zinc-800">
+                  <td className="py-2 px-4 text-center border-l border-zinc-800 sticky left-0 z-20 bg-zinc-950 group-hover:bg-zinc-800/90 transition-colors">
                     <button 
                       onClick={() => toggleFavorite(series.seriesName)}
                       className={`p-1 rounded hover:bg-zinc-700 transition ${isFav ? 'text-yellow-500' : 'text-zinc-600'}`}
@@ -95,8 +95,8 @@ export function PlannerMatrix({ schedule, freeTracks = [] }: Props) {
                       <Star className="w-4 h-4" fill={isFav ? "currentColor" : "none"} />
                     </button>
                   </td>
-                  <td className="py-2 px-4">
-                    <p className="font-bold text-zinc-200 truncate max-w-[250px]" title={series.seriesName}>
+                  <td className="py-2 px-4 sticky left-14 z-20 bg-zinc-950 group-hover:bg-zinc-800/90 transition-colors shadow-[2px_0_5px_rgba(0,0,0,0.3)]">
+                    <p className="font-bold text-zinc-200 whitespace-normal min-w-[200px]" title={series.seriesName}>
                       {series.seriesName}
                     </p>
                     <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{series.category}</p>

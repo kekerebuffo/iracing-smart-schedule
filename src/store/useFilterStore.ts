@@ -25,6 +25,10 @@ interface FilterState {
   toggleWishlistTrack: (track: string) => void;
   userEmail: string | null;
   setUserEmail: (email: string | null) => void;
+  pilotName: string;
+  pilotNationality: string;
+  setPilotName: (name: string) => void;
+  setPilotNationality: (nat: string) => void;
 }
 
 export const useFilterStore = create<FilterState>()(
@@ -76,6 +80,10 @@ export const useFilterStore = create<FilterState>()(
           ? state.wishlistCars.filter(c => c !== car)
           : [...state.wishlistCars, car]
       })),
+      pilotName: 'Piloto',
+      pilotNationality: 'ES',
+      setPilotName: (name) => set({ pilotName: name }),
+      setPilotNationality: (nat) => set({ pilotNationality: nat }),
       toggleWishlistTrack: (track) => set((state) => ({
         wishlistTracks: state.wishlistTracks.includes(track)
           ? state.wishlistTracks.filter(t => t !== track)

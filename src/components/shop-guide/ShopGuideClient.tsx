@@ -1,9 +1,10 @@
 'use client'
 
-import { IRacingSeries } from '@/lib/scheduleProcessor';
+import { IRacingSeries, getCurrentWeek } from '@/lib/scheduleProcessor';
 import { useFilterStore } from '@/store/useFilterStore';
-import { TrendingUp, CheckCircle2, Heart, Minus } from 'lucide-react';
-import { useMemo } from 'react';
+import { TrendingUp, CheckCircle2, Heart, Minus, Info } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { SeriesInfoModal } from '../ui/SeriesInfoModal';
 
 interface Props {
   schedule: IRacingSeries[];
@@ -12,6 +13,7 @@ interface Props {
 
 export function ShopGuideClient({ schedule, freeTracks = [] }: Props) {
   const { favorites, ownedTracks, wishlistTracks, showOnlyOwned, toggleWishlistTrack, toggleOwnedTrack } = useFilterStore();
+  const [selectedSeries, setSelectedSeries] = useState<IRacingSeries | null>(null);
 
   const isFreeTrack = (trackName: string) => {
     if (freeTracks.some(ft => trackName.includes(ft) || ft.includes(trackName))) return true;
@@ -111,10 +113,20 @@ export function ShopGuideClient({ schedule, freeTracks = [] }: Props) {
                   </div>
                 </div>
 
-                <div className="mt-2 pl-11 text-sm text-zinc-500 flex flex-wrap gap-1">
-                  {stat.series.map(s => (
-                    <span key={s} className="bg-zinc-800/60 px-2 py-0.5 rounded text-[10px] truncate max-w-[220px]">{s}</span>
-                  ))}
+                <div className="mt-2 pl-11 text-sm text-zinc-500 flex flex-wrap gap-2">
+                  {stat.series.map(seriesName => {
+                    const seriesObj = schedule.find(s => s.seriesName === seriesName);
+                    return (
+                      <button 
+                        key={seriesName} 
+                        onClick={() => setSelectedSeries(seriesObj || null)}
+                        className="bg-zinc-800 hover:bg-zinc-700 hover:text-white px-2 py-0.5 rounded text-[10px] transition-colors flex items-center gap-1 group/s"
+                      >
+                        {seriesName}
+                        <Info className="w-2.5 h-2.5 opacity-0 group-hover/s:opacity-100 transition-opacity" />
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -172,6 +184,15 @@ export function ShopGuideClient({ schedule, freeTracks = [] }: Props) {
           </div>
         )}
       </div>
+
+      {selectedSeries && (
+        <SeriesInfoModal 
+          isOpen={!!selectedSeries}
+          onClose={() => setSelectedSeries(null)}
+          series={selectedSeries}
+          currentWeek={getCurrentWeek(selectedSeries)}
+        />
+      )}
     </div>
   );
 }

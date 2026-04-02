@@ -59,7 +59,8 @@ const dictionaries = {
   },
   es: {
     dashboard: "Panel de Carreras",
-    dashboard_desc: "Encuentra tu próxima carrera entre {count} series activas.",
+    dashboard_desc: "Gestiona tu carrera profesional de Simracing.",
+    planner_desc: "Marca tus Series Favoritas con la estrella para poder hacer un seguimiento detallado en el resto de la app.",
     week: "SEMANA",
     season_reset: "Reinicio de Temporada Próximo",
     season_reset_desc: "Faltan menos de 48 horas para el reinicio del martes 00:00 UTC. ¡Prepárate para los nuevos circuitos!",
