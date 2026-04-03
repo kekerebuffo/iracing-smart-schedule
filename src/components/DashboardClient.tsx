@@ -107,19 +107,6 @@ export function DashboardClient({ schedule, freeCars = [], freeTracks = [], init
         </div>
       )}
 
-      {hideHeader && (
-        <div className="flex justify-end mb-4">
-          <div className="flex items-center gap-3 bg-zinc-900/50 border border-zinc-800 p-3 rounded-xl scale-90 origin-right">
-            <div className="bg-blue-600/20 p-2 rounded-lg">
-              <Calendar className="w-5 h-5 text-blue-500" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{seasonInfo}</p>
-              <p className="text-white font-black text-lg leading-none mt-1">{t('week')} {currentIRacingWeek}</p>
-            </div>
-          </div>
-        </div>
-      )}
 
 
       {!initialView && (

@@ -37,16 +37,11 @@ export default function GarageClient({ cars, tracks }: Props) {
   }, [cars]);
 
   const groupedTracks = useMemo(() => {
-    const groups: Record<string, iRacingTrack[]> = {
-      'Contenido Base (Gratis)': [],
-      'Contenido de Pago': []
-    };
+    const groups: Record<string, iRacingTrack[]> = {};
     tracks.forEach(track => {
-      if (track.free_with_subscription === 'TRUE') {
-        groups['Contenido Base (Gratis)'].push(track);
-      } else {
-        groups['Contenido de Pago'].push(track);
-      }
+      const cat = track.category || 'Otros';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(track);
     });
     return groups;
   }, [tracks]);
@@ -278,14 +273,8 @@ export default function GarageClient({ cars, tracks }: Props) {
                     return (
                       <div key={groupName} className="relative">
                         <div className="flex items-center gap-4 mb-6">
-                          <h2 className={cn(
-                            "text-xl font-black uppercase tracking-[0.2em] italic shrink-0",
-                            groupName.includes('Base') ? "text-green-500" : "text-teal-400"
-                          )}>{groupName}</h2>
-                          <div className={cn(
-                            "h-px flex-1",
-                            groupName.includes('Base') ? "bg-gradient-to-r from-green-900/50 to-transparent" : "bg-gradient-to-r from-teal-900/50 to-transparent"
-                          )} />
+                          <h2 className="text-xl font-black text-teal-400 uppercase tracking-[0.2em] italic shrink-0">{groupName}</h2>
+                          <div className="h-px bg-gradient-to-r from-teal-900/50 to-transparent flex-1" />
                         </div>
                         
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -293,6 +282,7 @@ export default function GarageClient({ cars, tracks }: Props) {
                             <ContentCard 
                               key={track.track_id}
                               name={track.track_name}
+                              variant={track.config_name}
                               isOwned={ownedTracks.includes(track.track_name)}
                               onToggle={() => toggleOwnedTrack(track.track_name)}
                               type="track"
@@ -408,7 +398,8 @@ export default function GarageClient({ cars, tracks }: Props) {
   );
 }
 
-function ContentCard({ name, isOwned, onToggle, type, isFree, onInfo }: { name: string, isOwned: boolean, onToggle: () => void, type: 'car' | 'track', isFree: boolean, onInfo: () => void }) {
+function ContentCard({ name, variant, isOwned, onToggle, type, isFree, onInfo }: { name: string, variant?: string, isOwned: boolean, onToggle: () => void, type: 'car' | 'track', isFree: boolean, onInfo: () => void }) {
+  const { t } = useLanguageStore();
   const displayOwned = isOwned || isFree;
   return (
     <div
@@ -463,11 +454,18 @@ function ContentCard({ name, isOwned, onToggle, type, isFree, onInfo }: { name: 
         className="w-full text-left flex-1"
       >
         <h3 className={cn(
-          "font-bold text-xs sm:text-sm leading-tight transition-colors line-clamp-2 uppercase italic",
+          "font-bold text-xs sm:text-sm leading-tight transition-colors line-clamp-2 uppercase italic mb-1",
           displayOwned ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"
         )}>
           {name}
         </h3>
+        {variant && (
+          <div className="flex items-center gap-1.5 mt-auto">
+            <span className="shrink-0 bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-widest shadow-[0_0_10px_rgba(59,130,246,0.1)]">
+              {variant}
+            </span>
+          </div>
+        )}
       </button>
 
       {!isFree && (
