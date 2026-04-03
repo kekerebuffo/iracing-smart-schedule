@@ -1,4 +1,5 @@
 import scheduleData from '../../public/schedule.json';
+import { getIRacingWeek } from './dateUtils';
 
 export interface SeriesWeek {
   weekNum: number;
@@ -25,11 +26,7 @@ export const getFullSchedule = (): IRacingSeries[] => {
 };
 
 export const getCurrentWeek = (series: IRacingSeries, currentDate = new Date()): SeriesWeek => {
-  let current = null;
-  for (const w of series.weeks) {
-    if (new Date(w.startDate) <= currentDate) {
-      current = w;
-    }
-  }
+  const currentWeekNum = getIRacingWeek();
+  const current = series.weeks.find(w => w.weekNum === currentWeekNum);
   return current || series.weeks[0];
 };

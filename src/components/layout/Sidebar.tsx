@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Calendar, Flag, CalendarDays, Car, Map, ShoppingCart, Menu, X, LayoutGrid, TableProperties } from 'lucide-react';
+import { Home, Calendar, Flag, CalendarDays, Car, Map, ShoppingCart, Menu, X, LayoutGrid, TableProperties, HelpCircle } from 'lucide-react';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { useSidebarStore } from '@/store/useSidebarStore';
+import { useState } from 'react';
+import { HelpModal } from '../ui/HelpModal';
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -16,6 +18,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { t } = useLanguageStore();
   const { isOpen, close } = useSidebarStore();
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const links = [
     { href: '/garage', label: t('garage'), icon: Car, color: 'text-indigo-400', border: 'border-indigo-500/20' },
@@ -89,11 +92,23 @@ export default function Sidebar() {
           );
         })}
         </nav>
-        <div className="mt-auto px-3 py-2 text-[10px] text-zinc-600 font-mono flex items-center justify-between border-t border-zinc-800/50 pt-4">
-          <span>v2.1 / iR-API</span>
-          <span className="text-red-900/50 uppercase font-black tracking-tighter">ZazoApp</span>
+        <div className="mt-auto space-y-4">
+          <button
+            onClick={() => setIsHelpOpen(true)}
+            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-md text-zinc-400 hover:text-white hover:bg-blue-600/10 border border-transparent hover:border-blue-500/20 transition-all font-bold text-sm uppercase italic tracking-wider group"
+          >
+            <HelpCircle className="w-5 h-5 text-blue-500 group-hover:animate-bounce" />
+            <span>Ayuda / Guía</span>
+          </button>
+          
+          <div className="px-3 py-2 text-[10px] text-zinc-600 font-mono flex items-center justify-between border-t border-zinc-800/50 pt-4">
+            <span>v2.2 / iR-API</span>
+            <span className="text-red-900/50 uppercase font-black tracking-tighter">ZazoApp</span>
+          </div>
         </div>
       </aside>
+
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </>
   );
 }
