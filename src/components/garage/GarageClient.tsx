@@ -28,12 +28,38 @@ export default function GarageClient({ cars, tracks }: Props) {
   const groupedCars = useMemo(() => {
     const groups: Record<string, iRacingCar[]> = {};
     cars.forEach(car => {
-      const cat = car.categories || 'Otros';
+      // Use clean names for categories
+      const cat = car.categories?.split(',')[0].replace(/_/g, ' ') || 'Otros';
       if (!groups[cat]) groups[cat] = [];
       groups[cat].push(car);
     });
     return groups;
   }, [cars]);
+
+  const groupedTracks = useMemo(() => {
+    const groups: Record<string, iRacingTrack[]> = {
+      'Contenido Base (Gratis)': [],
+      'Contenido de Pago': []
+    };
+    tracks.forEach(track => {
+      if (track.free_with_subscription === 'TRUE') {
+        groups['Contenido Base (Gratis)'].push(track);
+      } else {
+        groups['Contenido de Pago'].push(track);
+      }
+    });
+    return groups;
+  }, [tracks]);
+
+  const getFlagEmoji = (code: string) => {
+    const flags: Record<string, string> = {
+      'ES': '🇪🇸', 'US': '🇺🇸', 'GB': '🇬🇧', 'DE': '🇩🇪', 'FR': '🇫🇷',
+      'IT': '🇮🇹', 'BR': '🇧🇷', 'AR': '🇦🇷', 'MX': '🇲🇽', 'CL': '🇨🇱',
+      'CO': '🇨🇴', 'UY': '🇺🇾', 'PT': '🇵🇹', 'JP': '🇯🇵', 'CA': '🇨🇦',
+      'AU': '🇦🇺'
+    };
+    return flags[code] || '🏁';
+  };
 
   const filteredCars = useMemo(() => {
     return cars.filter(c => 
@@ -59,9 +85,13 @@ export default function GarageClient({ cars, tracks }: Props) {
             </div>
             <h1 className="text-4xl font-black text-white tracking-tight uppercase italic">Mi Garaje</h1>
           </div>
-          <p className="text-zinc-400 font-medium max-w-xl">
-            Selecciona los coches y circuitos que tienes. Usaremos los datos de los CSV para mayor precisión.
-          </p>
+          <div className="flex items-center gap-3 bg-zinc-900/50 border border-zinc-800/80 px-4 py-2 rounded-xl w-fit">
+            <span className="text-2xl" role="img" aria-label="flag">{getFlagEmoji(pilotNationality)}</span>
+            <div>
+              <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest leading-none mb-1">Piloto Oficial</p>
+              <p className="text-white font-bold text-sm tracking-wide uppercase italic">{pilotName}</p>
+            </div>
+          </div>
         </div>
         
         <div className="flex bg-zinc-900/80 p-1.5 rounded-2xl border border-zinc-800 shadow-2xl relative">
@@ -165,13 +195,13 @@ export default function GarageClient({ cars, tracks }: Props) {
                         key={nat.code}
                         onClick={() => setPilotNationality(nat.code)}
                         className={cn(
-                          "flex items-center justify-center gap-2 p-3 rounded-xl border transition-all font-bold text-xs uppercase tracking-wider",
+                          "flex items-center justify-center gap-2 p-3 rounded-xl border transition-all font-bold text-base uppercase tracking-wider",
                           pilotNationality === nat.code 
                             ? "bg-red-600 border-red-500 text-white shadow-lg" 
                             : "bg-zinc-950 border-zinc-800 text-zinc-500 hover:border-zinc-700"
                         )}
                       >
-                        <span>{nat.flag}</span> {nat.code}
+                        <span className="text-2xl">{nat.flag}</span> {nat.code}
                       </button>
                     ))}
                   </div>
@@ -196,47 +226,82 @@ export default function GarageClient({ cars, tracks }: Props) {
                 />
               </div>
 
-              {activeTab === 'cars' && searchQuery === '' ? (
+              {activeTab === 'cars' ? (
                 <div className="space-y-12">
-                  {Object.entries(groupedCars).map(([groupName, groupCars]) => (
-                    <div key={groupName} className="relative">
-                      <div className="flex items-center gap-4 mb-6">
-                        <h2 className="text-xl font-black text-indigo-400 uppercase tracking-[0.2em] italic shrink-0">{groupName.replace('_', ' ')}</h2>
-                        <div className="h-px bg-gradient-to-r from-indigo-900/50 to-transparent flex-1" />
+                  {Object.entries(groupedCars).map(([groupName, groupCars]) => {
+                    // In search mode, check if any car in the group matches
+                    const visibleCars = searchQuery === '' 
+                      ? groupCars 
+                      : groupCars.filter(c => 
+                          c.car_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          c.car_make.toLowerCase().includes(searchQuery.toLowerCase())
+                        );
+                    
+                    if (visibleCars.length === 0) return null;
+
+                    return (
+                      <div key={groupName} className="relative">
+                        <div className="flex items-center gap-4 mb-6">
+                          <h2 className="text-xl font-black text-indigo-400 uppercase tracking-[0.2em] italic shrink-0">{groupName.replace('_', ' ')}</h2>
+                          <div className="h-px bg-gradient-to-r from-indigo-900/50 to-transparent flex-1" />
+                        </div>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                          {visibleCars.map(car => (
+                            <ContentCard 
+                              key={car.car_id}
+                              name={car.car_name}
+                              isOwned={ownedCars.includes(car.car_name)}
+                              onToggle={() => toggleOwnedCar(car.car_name)}
+                              type="car"
+                              isFree={car.free_with_subscription === 'TRUE'}
+                              onInfo={() => setSelectedContent({type: 'car', data: car})}
+                            />
+                          ))}
+                        </div>
                       </div>
-                      
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        {groupCars.map(car => (
-                          <ContentCard 
-                            key={car.car_id}
-                            name={car.car_name}
-                            isOwned={ownedCars.includes(car.car_name)}
-                            onToggle={() => toggleOwnedCar(car.car_name)}
-                            type="car"
-                            isFree={car.free_with_subscription === 'TRUE'}
-                            onInfo={() => setSelectedContent({type: 'car', data: car})}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {(activeTab === 'cars' ? filteredCars : filteredTracks).map(item => {
-                    const name = 'car_name' in item ? item.car_name : item.track_name;
-                    const id = 'car_id' in item ? item.car_id : item.track_id;
-                    const isFree = item.free_with_subscription === 'TRUE';
+                <div className="space-y-12">
+                  {Object.entries(groupedTracks).map(([groupName, groupTracks]) => {
+                    const visibleTracks = searchQuery === '' 
+                      ? groupTracks 
+                      : groupTracks.filter(t => 
+                          t.track_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          t.location.toLowerCase().includes(searchQuery.toLowerCase())
+                        );
+                    
+                    if (visibleTracks.length === 0) return null;
+
                     return (
-                      <ContentCard 
-                        key={id}
-                        name={name}
-                        isOwned={activeTab === 'cars' ? ownedCars.includes(name) : ownedTracks.includes(name)}
-                        onToggle={() => activeTab === 'cars' ? toggleOwnedCar(name) : toggleOwnedTrack(name)}
-                        type={activeTab === 'cars' ? "car" : "track"}
-                        isFree={isFree}
-                        onInfo={() => setSelectedContent({type: activeTab === 'cars' ? 'car' : 'track', data: item})}
-                      />
+                      <div key={groupName} className="relative">
+                        <div className="flex items-center gap-4 mb-6">
+                          <h2 className={cn(
+                            "text-xl font-black uppercase tracking-[0.2em] italic shrink-0",
+                            groupName.includes('Base') ? "text-green-500" : "text-teal-400"
+                          )}>{groupName}</h2>
+                          <div className={cn(
+                            "h-px flex-1",
+                            groupName.includes('Base') ? "bg-gradient-to-r from-green-900/50 to-transparent" : "bg-gradient-to-r from-teal-900/50 to-transparent"
+                          )} />
+                        </div>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                          {visibleTracks.map(track => (
+                            <ContentCard 
+                              key={track.track_id}
+                              name={track.track_name}
+                              isOwned={ownedTracks.includes(track.track_name)}
+                              onToggle={() => toggleOwnedTrack(track.track_name)}
+                              type="track"
+                              isFree={track.free_with_subscription === 'TRUE'}
+                              onInfo={() => setSelectedContent({type: 'track', data: track})}
+                            />
+                          ))}
+                        </div>
+                      </div>
                     );
                   })}
                 </div>
@@ -246,43 +311,79 @@ export default function GarageClient({ cars, tracks }: Props) {
         </>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Owned Cars */}
+          {/* My Cars Dashboard View */}
           <div className="space-y-6">
             <div className="flex items-center gap-4 mb-4 border-b border-zinc-800 pb-4">
               <Car className="w-5 h-5 text-indigo-400" />
-              <h2 className="text-xl font-black text-white uppercase italic tracking-wider">Mis Coches ({ownedCars.length})</h2>
+              <h2 className="text-xl font-black text-white uppercase italic tracking-wider">Mis Coches</h2>
             </div>
-            <div className="grid gap-2">
-              {ownedCars.length === 0 ? (
-                <p className="text-zinc-600 italic">No has seleccionado ningún coche de pago.</p>
-              ) : (
-                ownedCars.sort().map(car => (
-                  <div key={car} className="bg-zinc-900/50 p-3 rounded-lg border border-zinc-800 flex items-center justify-between group">
-                    <span className="text-zinc-300 font-bold text-sm uppercase italic">{car}</span>
-                    <button onClick={() => toggleOwnedCar(car)} className="text-[10px] text-zinc-600 hover:text-red-500 font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity">Eliminar</button>
+            
+            <div className="space-y-8">
+              {Object.entries(groupedCars).map(([cat, carList]) => {
+                const ownedInCat = carList.filter(c => c.free_with_subscription === 'TRUE' || ownedCars.includes(c.car_name));
+                if (ownedInCat.length === 0) return null;
+                
+                return (
+                  <div key={cat} className="space-y-3">
+                    <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">{cat}</h3>
+                    <div className="grid gap-2">
+                      {ownedInCat.sort((a,b) => a.car_name.localeCompare(b.car_name)).map(car => (
+                        <div key={car.car_id} className="bg-zinc-900/50 p-3 rounded-lg border border-zinc-800 flex items-center justify-between group">
+                          <div className="flex items-center gap-3">
+                            <span className="text-zinc-300 font-bold text-sm uppercase italic">{car.car_name}</span>
+                            {car.free_with_subscription === 'TRUE' && (
+                              <span className="text-[8px] font-black bg-green-500/20 text-green-500 px-1.5 py-0.5 rounded border border-green-500/30 uppercase tracking-tighter">BASE</span>
+                            )}
+                          </div>
+                          {car.free_with_subscription !== 'TRUE' && (
+                            <button onClick={() => toggleOwnedCar(car.car_name)} className="text-[10px] text-zinc-600 hover:text-red-500 font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity">Eliminar</button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))
-              )}
+                );
+              })}
             </div>
           </div>
 
-          {/* Owned Tracks */}
+          {/* My Tracks Dashboard View */}
           <div className="space-y-6">
             <div className="flex items-center gap-4 mb-4 border-b border-zinc-800 pb-4">
               <Map className="w-5 h-5 text-teal-400" />
-              <h2 className="text-xl font-black text-white uppercase italic tracking-wider">Mis Circuitos ({ownedTracks.length})</h2>
+              <h2 className="text-xl font-black text-white uppercase italic tracking-wider">Mis Circuitos</h2>
             </div>
-            <div className="grid gap-2">
-              {ownedTracks.length === 0 ? (
-                <p className="text-zinc-600 italic">No has seleccionado ningún circuito de pago.</p>
-              ) : (
-                ownedTracks.sort().map(track => (
-                  <div key={track} className="bg-zinc-900/50 p-3 rounded-lg border border-zinc-800 flex items-center justify-between group">
-                    <span className="text-zinc-300 font-bold text-sm uppercase italic">{track}</span>
-                    <button onClick={() => toggleOwnedTrack(track)} className="text-[10px] text-zinc-600 hover:text-red-500 font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity">Eliminar</button>
+
+            <div className="space-y-8">
+              {Object.entries(groupedTracks).map(([group, trackList]) => {
+                const isBaseGroup = group === 'Contenido Base (Gratis)';
+                const ownedInGroup = trackList.filter(t => t.free_with_subscription === 'TRUE' || ownedTracks.includes(t.track_name));
+                if (ownedInGroup.length === 0) return null;
+
+                return (
+                  <div key={group} className="space-y-3">
+                    <h3 className={cn(
+                      "text-[10px] font-black uppercase tracking-[0.2em]",
+                      isBaseGroup ? "text-green-500/70" : "text-zinc-500"
+                    )}>{group}</h3>
+                    <div className="grid gap-2">
+                      {ownedInGroup.sort((a,b) => a.track_name.localeCompare(b.track_name)).map(track => (
+                        <div key={track.track_id} className="bg-zinc-900/50 p-3 rounded-lg border border-zinc-800 flex items-center justify-between group">
+                          <div className="flex items-center gap-3">
+                            <span className="text-zinc-300 font-bold text-sm uppercase italic">{track.track_name}</span>
+                            {track.free_with_subscription === 'TRUE' && (
+                              <span className="text-[8px] font-black bg-green-500/20 text-green-500 px-1.5 py-0.5 rounded border border-green-500/30 uppercase tracking-tighter">BASE</span>
+                            )}
+                          </div>
+                          {track.free_with_subscription !== 'TRUE' && (
+                            <button onClick={() => toggleOwnedTrack(track.track_name)} className="text-[10px] text-zinc-600 hover:text-red-500 font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity">Eliminar</button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))
-              )}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -344,10 +445,13 @@ function ContentCard({ name, isOwned, onToggle, type, isFree, onInfo }: { name: 
           </button>
           {displayOwned && (
             <div className="flex items-center gap-2">
-              {isFree && <span className="text-[8px] font-black bg-green-500 text-white px-1.5 py-0.5 rounded uppercase tracking-tighter">BASE</span>}
-              <div className="bg-indigo-600 rounded-full p-1 shadow-md">
-                <Check className="w-3 h-3 text-white" strokeWidth={4} />
-              </div>
+              {isFree ? (
+                <span className="text-[8px] font-black bg-green-500/20 text-green-500 px-1.5 py-0.5 rounded border border-green-500/30 uppercase tracking-tighter shadow-md shadow-green-900/20">BASE</span>
+              ) : (
+                <div className="bg-indigo-600 rounded-full p-1 shadow-md">
+                  <Check className="w-3 h-3 text-white" strokeWidth={4} />
+                </div>
+              )}
             </div>
           )}
         </div>

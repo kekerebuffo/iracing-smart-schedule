@@ -8,6 +8,7 @@ import { isTuesdayAlertActive } from '@/lib/dateUtils';
 import { cn } from '@/components/layout/Sidebar';
 import { Clock, Star, CalendarDays, ListTree, Timer, Thermometer, CloudRain, Flag, Car, Info, ChevronRight } from 'lucide-react';
 import { SeriesInfoModal } from '../ui/SeriesInfoModal';
+import { formatTrackName } from '@/lib/utils';
 
 interface Props {
   schedule: IRacingSeries[];
@@ -141,11 +142,8 @@ export function AgendaClient({ schedule, freeCars = [], freeTracks = [] }: Props
                               <td className="px-6 py-3.5 text-zinc-400 font-mono text-xs">
                                 {wk.startDate}
                               </td>
-                              <td className={cn("px-6 py-3.5 font-medium flex items-center gap-2", isCurrent ? "text-white" : "text-zinc-500")}>
-                                {wk.trackName}
-                                {isTrackOwned(wk.trackName) && (
-                                  <span className="text-[8px] font-black text-green-500 bg-green-500/10 px-1 py-0.5 rounded border border-green-500/20 uppercase">Owned</span>
-                                )}
+                              <td className={cn("px-6 py-3.5 font-medium flex items-center gap-2", isCurrent ? "text-white" : "text-zinc-400 font-bold italic")}>
+                                {formatTrackName(wk.trackName)}
                               </td>
                               <td className="px-6 py-3.5 text-center">
                                 {isCurrent ? (
@@ -155,9 +153,9 @@ export function AgendaClient({ schedule, freeCars = [], freeTracks = [] }: Props
                                     </span>
                                     <button 
                                       onClick={() => setSelectedSeries({ series, week: wk })}
-                                      className="text-[9px] font-black text-red-500 hover:text-red-400 uppercase tracking-widest flex items-center gap-0.5"
+                                      className="bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-black px-3 py-1 rounded uppercase tracking-widest transition-all shadow-lg"
                                     >
-                                      Más info <ChevronRight className="w-2.5 h-2.5" />
+                                      Más info
                                     </button>
                                   </div>
                                 ) : isNext && alertActive ? (
@@ -167,18 +165,28 @@ export function AgendaClient({ schedule, freeCars = [], freeTracks = [] }: Props
                                     </span>
                                     <button 
                                       onClick={() => setSelectedSeries({ series, week: wk })}
-                                      className="text-[9px] font-black text-red-500 hover:text-red-400 uppercase tracking-widest flex items-center gap-0.5"
+                                      className="bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-black px-3 py-1 rounded uppercase tracking-widest transition-all shadow-lg"
                                     >
-                                      Más info <ChevronRight className="w-2.5 h-2.5" />
+                                      Más info
                                     </button>
                                   </div>
                                 ) : (
-                                  <button 
-                                    onClick={() => setSelectedSeries({ series, week: wk })}
-                                    className="text-[9px] font-black text-zinc-500 hover:text-white uppercase tracking-widest flex items-center gap-0.5"
-                                  >
-                                    Ver Detalles <ChevronRight className="w-2.5 h-2.5" />
-                                  </button>
+                                  <div className="flex flex-col items-center gap-2">
+                                    {(() => {
+                                      const carOwned = isCarOwned(series);
+                                      const trackOwned = isTrackOwned(wk.trackName);
+                                      if (carOwned && trackOwned) return <span className="text-[10px] font-black text-green-400 bg-green-500/10 px-2 py-1 rounded border border-green-500/20 uppercase tracking-widest">{t('all_owned')}</span>;
+                                      if (carOwned) return <span className="text-[10px] font-black text-orange-400 bg-orange-400/10 px-2 py-1 rounded border border-orange-400/20 uppercase tracking-widest">{t('missing_track')}</span>;
+                                      if (trackOwned) return <span className="text-[10px] font-black text-purple-400 bg-purple-400/10 px-2 py-1 rounded border border-purple-400/20 uppercase tracking-widest">{t('missing_car')}</span>;
+                                      return <span className="text-[10px] font-black text-zinc-500 bg-zinc-500/10 px-2 py-1 rounded border border-zinc-500/20 uppercase tracking-widest">{t('missing_all')}</span>;
+                                    })()}
+                                    <button 
+                                      onClick={() => setSelectedSeries({ series, week: wk })}
+                                      className="bg-zinc-800 hover:bg-zinc-700 text-white text-[10px] font-black px-3 py-1 rounded uppercase tracking-widest transition-all border border-zinc-700/50"
+                                    >
+                                      Ver Detalles
+                                    </button>
+                                  </div>
                                 )}
                               </td>
                             </tr>
@@ -232,15 +240,17 @@ export function AgendaClient({ schedule, freeCars = [], freeTracks = [] }: Props
                           <div className="overflow-hidden flex-1">
                             <div className="flex items-center justify-between gap-2">
                               <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest select-none truncate">{ev.series.seriesName}</div>
-                              {isCarOwned(ev.series) && (
-                                <span className="text-[8px] font-black text-purple-400 bg-purple-500/10 px-1 py-0.5 rounded border border-purple-500/20 uppercase shrink-0">Owned</span>
-                              )}
+                              {(() => {
+                                const carOwned = isCarOwned(ev.series);
+                                const trackOwned = isTrackOwned(ev.week.trackName);
+                                if (carOwned && trackOwned) return <span className="text-[8px] font-black text-green-500 bg-green-500/10 px-1 py-0.5 rounded border border-green-500/20 uppercase shrink-0">{t('all_owned')}</span>;
+                                if (carOwned) return <span className="text-[8px] font-black text-orange-400 bg-orange-400/10 px-1 py-0.5 rounded border border-orange-400/20 uppercase shrink-0">{t('missing_track')}</span>;
+                                if (trackOwned) return <span className="text-[8px] font-black text-purple-400 bg-purple-400/10 px-1 py-0.5 rounded border border-purple-400/20 uppercase shrink-0">{t('missing_car')}</span>;
+                                return <span className="text-[8px] font-black text-zinc-500 bg-zinc-500/10 px-1 py-0.5 rounded border border-zinc-500/20 uppercase shrink-0">{t('missing_all')}</span>;
+                              })()}
                             </div>
                             <div className="text-sm font-medium text-white max-w-full truncate mt-0.5 flex items-center gap-2">
-                              <span className="truncate">{ev.week.trackName}</span>
-                              {isTrackOwned(ev.week.trackName) && (
-                                <span className="text-[8px] font-black text-green-500 bg-green-500/10 px-1 py-0.5 rounded border border-green-500/20 uppercase shrink-0">Owned</span>
-                              )}
+                              <span className="truncate">{formatTrackName(ev.week.trackName)}</span>
                             </div>
                             
                             <div className="flex flex-wrap items-center justify-between gap-2 mt-2">
@@ -258,9 +268,9 @@ export function AgendaClient({ schedule, freeCars = [], freeTracks = [] }: Props
                               </div>
                               <button 
                                 onClick={() => setSelectedSeries({ series: ev.series, week: ev.week })}
-                                className="text-[9px] font-black text-red-500 hover:text-red-400 uppercase tracking-[0.1em] flex items-center gap-0.5 ml-auto"
+                                className="bg-purple-600 hover:bg-purple-500 text-white text-[9px] font-bold px-2 py-1 rounded uppercase tracking-widest transition-all shadow-md ml-auto"
                               >
-                                Más info <Info className="w-2.5 h-2.5" />
+                                Más info
                               </button>
                             </div>
                           </div>

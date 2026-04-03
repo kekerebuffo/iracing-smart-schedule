@@ -12,9 +12,6 @@ export default async function PlannerPage() {
     <div className="space-y-6">
       <div className="flex flex-col">
         <h1 className="text-3xl font-black tracking-tight text-white mb-2 uppercase italic">Planificador de Temporada</h1>
-        <p className="text-zinc-400 font-medium max-w-2xl">
-          Marca tus **Series Favoritas** con la estrella para poder hacer un seguimiento detallado en el resto de las funciones de la app.
-        </p>
       </div>
       
       <DashboardClient 
@@ -23,6 +20,7 @@ export default async function PlannerPage() {
         freeCars={freeCars}
         freeTracks={freeTracks}
         initialView="matrix"
+        hideHeader={true}
       />
     </div>
   );

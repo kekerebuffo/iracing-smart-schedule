@@ -5,6 +5,7 @@ import { useFilterStore } from '@/store/useFilterStore';
 import { getIRacingWeek } from '@/lib/dateUtils';
 import { useState } from 'react';
 import { Star, StarOff } from 'lucide-react';
+import { formatTrackName } from '@/lib/utils';
 
 interface Props {
   schedule: IRacingSeries[];
@@ -140,7 +141,7 @@ export function PlannerMatrix({ schedule, freeTracks = [] }: Props) {
                           title={`${tName} \nDuration: ${weekData.duration || tName}`}
                         >
                           <p className="text-[10px] font-bold uppercase truncate leading-tight">
-                            {tName}
+                            {formatTrackName(tName)}
                           </p>
                         </div>
                       </td>

@@ -17,9 +17,10 @@ interface Props {
   freeCars: string[];
   freeTracks: string[];
   initialView?: 'matrix' | 'cards';
+  hideHeader?: boolean;
 }
 
-export function DashboardClient({ schedule, freeCars = [], freeTracks = [], initialView = 'cards' }: Props) {
+export function DashboardClient({ schedule, freeCars = [], freeTracks = [], initialView = 'cards', hideHeader = false }: Props) {
   const { t } = useLanguageStore();
   const { 
     ownedOnly, ownedCarsOnly, 
@@ -82,33 +83,33 @@ export function DashboardClient({ schedule, freeCars = [], freeTracks = [], init
 
   return (
     <div className="animate-in fade-in duration-500 max-w-[1600px] mx-auto pb-10">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight text-white mb-1 uppercase">{t('dashboard')}</h1>
-          <p className="text-zinc-400 font-medium truncate max-w-md">
-            {t('dashboard_desc').replace('{count}', filteredSchedule.length.toString())}
-          </p>
+      {!hideHeader && (
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl font-black tracking-tight text-white mb-1 uppercase">{t('dashboard')}</h1>
+            <p className="text-zinc-400 font-medium truncate max-w-md">
+              {t('dashboard_desc').replace('{count}', filteredSchedule.length.toString())}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Season info pill */}
+            <div className="flex items-center gap-3 bg-zinc-900/50 border border-zinc-800 p-3 rounded-xl">
+              <div className="bg-blue-600/20 p-2 rounded-lg">
+                <Calendar className="w-5 h-5 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{seasonInfo}</p>
+                <p className="text-white font-black text-lg leading-none mt-1">{t('week')} {currentIRacingWeek}</p>
+              </div>
+            </div>
+          </div>
         </div>
+      )}
 
-        <div className="flex items-center gap-2">
-          {/* My Cars / My Circuits quick links */}
-          <Link
-            href="/garage"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:text-white hover:border-zinc-500 transition-all text-sm font-bold"
-          >
-            <Car className="w-4 h-4 text-indigo-400" />
-            Mis Coches
-          </Link>
-          <Link
-            href="/garage"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:text-white hover:border-zinc-500 transition-all text-sm font-bold"
-          >
-            <Map className="w-4 h-4 text-teal-400" />
-            Mis Circuitos
-          </Link>
-
-          {/* Season info pill */}
-          <div className="flex items-center gap-3 bg-zinc-900/50 border border-zinc-800 p-3 rounded-xl">
+      {hideHeader && (
+        <div className="flex justify-end mb-4">
+          <div className="flex items-center gap-3 bg-zinc-900/50 border border-zinc-800 p-3 rounded-xl scale-90 origin-right">
             <div className="bg-blue-600/20 p-2 rounded-lg">
               <Calendar className="w-5 h-5 text-blue-500" />
             </div>
@@ -118,7 +119,7 @@ export function DashboardClient({ schedule, freeCars = [], freeTracks = [], init
             </div>
           </div>
         </div>
-      </div>
+      )}
 
 
       {!initialView && (

@@ -46,31 +46,18 @@ export function FilterBar() {
         </div>
         
         <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-          <Link 
-            href="/garage"
-            className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all whitespace-nowrap",
-              hasOwnedContent
-                ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_15px_rgba(79,70,229,0.4)]"
-                : "bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-600/40"
-            )}
-          >
-            <Car className="w-4 h-4" />
-            {hasOwnedContent ? t('garage') : t('configure_garage')}
-          </Link>
-          
           <button
             onClick={toggleShowOnlyOwned}
             disabled={!hasOwnedContent}
             className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap font-medium text-sm border",
+              "flex items-center gap-2 px-6 py-2.5 rounded-xl transition-all whitespace-nowrap font-bold text-sm border shadow-lg",
               showOnlyOwned 
-                ? "bg-green-600/20 text-green-400 border-green-500/50 hover:bg-green-600/30" 
+                ? "bg-green-600 border-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]" 
                 : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:bg-zinc-700 hover:text-white",
               !hasOwnedContent && "opacity-50 cursor-not-allowed"
             )}
           >
-            {showOnlyOwned ? <ToggleRight className="w-5 h-5 text-green-400" /> : <ToggleLeft className="w-5 h-5" />}
+            {showOnlyOwned ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
             {t('hide_unowned')}
           </button>
         </div>

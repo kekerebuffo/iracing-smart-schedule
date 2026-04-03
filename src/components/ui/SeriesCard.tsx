@@ -4,6 +4,7 @@ import { IRacingSeries, SeriesWeek } from '@/lib/scheduleProcessor';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { SeriesInfoModal } from './SeriesInfoModal';
 import { useState } from 'react';
+import { formatTrackName } from '@/lib/utils';
 
 interface Props {
   series: IRacingSeries;
@@ -69,15 +70,16 @@ export function SeriesCard({ series, currentWeek, isFavorite, onToggleFavorite, 
           </div>
           <div className="flex items-center justify-between pt-1 border-t border-zinc-800/30">
             <span className="text-[10px] text-zinc-100 font-black uppercase tracking-wider">{t('status')}</span>
-            {isApto ? (
-              <span className="text-[10px] font-black text-white bg-green-600 px-2 py-0.5 rounded shadow-[0_0_10px_rgba(34,197,94,0.3)] uppercase tracking-wider">{t('apto')}</span>
-            ) : (
-              <span className="text-[10px] font-black text-white bg-red-600/50 px-2 py-0.5 rounded uppercase tracking-wider">{t('no_apto')}</span>
-            )}
+            {(() => {
+              if (ownedCar && ownedTrack) return <span className="text-[10px] font-black text-green-400 bg-green-900/20 px-2 py-0.5 rounded border border-green-500/30 uppercase tracking-widest">{t('all_owned')}</span>;
+              if (ownedCar) return <span className="text-[10px] font-black text-orange-400 bg-orange-900/20 px-2 py-0.5 rounded border border-orange-500/30 uppercase tracking-widest">{t('missing_track')}</span>;
+              if (ownedTrack) return <span className="text-[10px] font-black text-purple-400 bg-purple-900/20 px-2 py-0.5 rounded border border-purple-500/30 uppercase tracking-widest">{t('missing_car')}</span>;
+              return <span className="text-[10px] font-black text-zinc-500 bg-zinc-900/20 px-2 py-0.5 rounded border border-zinc-500/30 uppercase tracking-widest">{t('missing_all')}</span>;
+            })()}
           </div>
         </div>
         <div className="bg-zinc-950/50 rounded p-3 text-zinc-300 font-medium text-[13px] border border-zinc-800/30">
-          📍 {currentWeek.trackName}
+          📍 {formatTrackName(currentWeek.trackName)}
         </div>
         
         <div className="mt-3 grid grid-cols-2 gap-1.5">
@@ -121,7 +123,7 @@ export function SeriesCard({ series, currentWeek, isFavorite, onToggleFavorite, 
 
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="mt-4 w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold py-2 rounded-md text-[10px] uppercase tracking-widest transition-all border border-zinc-700/50 hover:border-zinc-600 flex items-center justify-center gap-2 group/btn"
+          className="mt-4 w-full bg-purple-600 hover:bg-purple-500 text-white font-black py-2.5 rounded-md text-[10px] uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-2 group/btn"
         >
           Más información <ChevronRight className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
         </button>
